@@ -33,7 +33,7 @@ export function Footer() {
             </p>
             <p className="mt-4 text-sm text-gray-500">Aparg LLC</p>
           </div>
-          
+
           {/* Product links */}
           <div>
             <h3 className="text-sm font-semibold text-white">Product</h3>
@@ -50,7 +50,7 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
+
           {/* Company links */}
           <div>
             <h3 className="text-sm font-semibold text-white">Company</h3>
@@ -67,7 +67,7 @@ export function Footer() {
               ))}
             </ul>
           </div>
-          
+
           {/* Newsletter */}
           <div>
             <h3 className="text-sm font-semibold text-white">Stay updated</h3>
@@ -91,7 +91,7 @@ export function Footer() {
             </form>
           </div>
         </div>
-        
+
         <div className="mt-12 pt-8 border-t border-white/10">
           <p className="text-sm text-gray-500 text-center">
             &copy; {new Date().getFullYear()} Gingy by Aparg LLC. All rights reserved.

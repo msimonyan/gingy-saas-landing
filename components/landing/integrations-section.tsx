@@ -33,7 +33,7 @@ export function IntegrationsSection() {
             Gingy integrates with popular platforms for product data, inventory synchronization, and billing.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-3 gap-8">
           {integrations.map((integration) => (
             <div
@@ -48,7 +48,7 @@ export function IntegrationsSection() {
             </div>
           ))}
         </div>
-        
+
         <div className="mt-12 text-center">
           <a
             href="#api"

@@ -3,22 +3,24 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Check, Loader2, Sparkles, X, Zap } from 'lucide-react'
-import { fetchBillingPlans, createCheckout, type BillingPlan } from '@/lib/api'
+import { fetchBillingPlans, BILLING_INTERVAL, type BillingPlan } from '@/lib/api'
+
+const PANEL_URL = process.env.NEXT_PUBLIC_PANEL_URL || ''
 
 export function PricingSection() {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
   const [plans, setPlans] = useState<BillingPlan[]>([])
+  const [currency, setCurrency] = useState('RUB')
   const [loading, setLoading] = useState(true)
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null)
-  const [email, setEmail] = useState('')
-  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadPlans() {
       try {
-        const data = await fetchBillingPlans()
+        const { plans: data, currency: curr } = await fetchBillingPlans()
         setPlans(data)
+        setCurrency(curr)
       } catch (error) {
         console.error('Failed to load plans:', error)
       } finally {
@@ -30,38 +32,34 @@ export function PricingSection() {
 
   const handleSelectPlan = (planSlug: string) => {
     setSelectedPlan(planSlug)
-    setShowEmailModal(true)
+    setShowAuthModal(true)
   }
 
-  const handleCheckout = async () => {
-    if (!selectedPlan || !email) return
-
-    setCheckoutLoading(selectedPlan)
-    try {
-      const response = await createCheckout({
-        plan_slug: selectedPlan,
-        billing_interval: billingInterval,
-        email,
-        return_url: window.location.href,
-      })
-      window.location.href = response.confirmation_url
-    } catch (error) {
-      console.error('Checkout failed:', error)
-      alert('Checkout failed. Please try again.')
-    } finally {
-      setCheckoutLoading(null)
-      setShowEmailModal(false)
-    }
+  const buildAuthUrl = (path: 'login' | 'register') => {
+    if (!PANEL_URL || !selectedPlan) return '#'
+    const interval = billingInterval === 'monthly' ? BILLING_INTERVAL.MONTHLY : BILLING_INTERVAL.YEARLY
+    const base = PANEL_URL.replace(/\/$/, '')
+    const params = new URLSearchParams({
+      plan_slug: selectedPlan,
+      billing_interval: String(interval),
+      next: '/billing/checkout/start',
+    })
+    return `${base}/${path}?${params.toString()}`
   }
 
-  const getPrice = (price: number) => {
-    const monthlyPrice = price
-    const yearlyPrice = Math.round(price * 10) // 2 months free
+  const getPrice = (plan: BillingPlan) => {
+    const monthlyPrice = plan.monthlyPrice ?? plan.price
+    const yearlyPrice = plan.yearlyPrice ?? Math.round(monthlyPrice * 10) // ~2 months free fallback
     return billingInterval === 'monthly' ? monthlyPrice : yearlyPrice
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ru-RU').format(price)
+    return new Intl.NumberFormat('ru-RU', {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
   }
 
   if (loading) {
@@ -83,7 +81,7 @@ export function PricingSection() {
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-primary/5 to-accent/5 rounded-full blur-3xl" />
       </div>
-      
+
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-2 text-sm font-medium text-accent mb-6">
@@ -94,7 +92,7 @@ export function PricingSection() {
             Simple, Transparent Pricing
           </h2>
           <p className="mt-6 text-lg lg:text-xl text-muted-foreground">
-            Choose the plan that fits your operations. All plans include a 14-day free trial.
+            Choose the plan that fits your operations.
           </p>
         </div>
 
@@ -103,28 +101,25 @@ export function PricingSection() {
           <div className="inline-flex items-center bg-card rounded-2xl p-1.5 border border-border shadow-sm">
             <button
               onClick={() => setBillingInterval('monthly')}
-              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${
-                billingInterval === 'monthly'
+              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${billingInterval === 'monthly'
                   ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setBillingInterval('yearly')}
-              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${
-                billingInterval === 'yearly'
+              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${billingInterval === 'yearly'
                   ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
                   : 'text-muted-foreground hover:text-foreground'
-              }`}
+                }`}
             >
               Yearly
-              <span className={`text-xs px-2 py-0.5 rounded-full ${
-                billingInterval === 'yearly'
+              <span className={`text-xs px-2 py-0.5 rounded-full ${billingInterval === 'yearly'
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-accent/20 text-accent'
-              }`}>
+                }`}>
                 -17%
               </span>
             </button>
@@ -142,13 +137,12 @@ export function PricingSection() {
               {plan.popular && (
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/50 to-accent rounded-3xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity" />
               )}
-              
+
               <div
-                className={`relative h-full bg-card rounded-2xl border-2 p-8 transition-all duration-300 ${
-                  plan.popular
+                className={`relative h-full bg-card rounded-2xl border-2 p-8 transition-all duration-300 ${plan.popular
                     ? 'border-primary shadow-2xl shadow-primary/10'
                     : 'border-border hover:border-primary/30 hover:shadow-xl'
-                }`}
+                  }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -168,7 +162,7 @@ export function PricingSection() {
                   </p>
                   <div className="mt-6">
                     <span className="text-5xl font-bold text-foreground">
-                      {formatPrice(getPrice(plan.price))}
+                      {formatPrice(getPrice(plan))}
                     </span>
                     <span className="text-lg text-muted-foreground ml-1">
                       / {billingInterval === 'monthly' ? 'mo' : 'year'}
@@ -176,7 +170,7 @@ export function PricingSection() {
                   </div>
                   {billingInterval === 'yearly' && (
                     <p className="text-sm text-primary font-medium mt-2">
-                      {formatPrice(plan.price)} / month, billed annually
+                      {formatPrice(plan.monthlyPrice ?? plan.price)} / month, billed annually
                     </p>
                   )}
                 </div>
@@ -184,11 +178,10 @@ export function PricingSection() {
                 <ul className="space-y-4 mb-8">
                   {plan.features?.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        plan.popular 
-                          ? 'bg-primary text-primary-foreground' 
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${plan.popular
+                          ? 'bg-primary text-primary-foreground'
                           : 'bg-primary/10 text-primary'
-                      }`}>
+                        }`}>
                         <Check className="w-3 h-3" strokeWidth={3} />
                       </div>
                       <span className="text-sm text-foreground">{feature}</span>
@@ -198,60 +191,47 @@ export function PricingSection() {
 
                 <Button
                   onClick={() => handleSelectPlan(plan.slug)}
-                  disabled={checkoutLoading === plan.slug}
-                  className={`w-full h-12 text-base font-semibold transition-all duration-300 ${
-                    plan.popular
+                  className={`w-full h-12 text-base font-semibold transition-all duration-300 ${plan.popular
                       ? 'shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5'
                       : 'hover:-translate-y-0.5'
-                  }`}
+                    }`}
                   variant={plan.popular ? 'default' : 'outline'}
                 >
-                  {checkoutLoading === plan.slug ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Start Free Trial'
-                  )}
+                  Get Started
                 </Button>
-                
-                <p className="text-center text-xs text-muted-foreground mt-4">
-                  No credit card required
-                </p>
               </div>
             </div>
           ))}
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-12">
-          All prices in RUB. VAT may apply. Cancel anytime during trial.
+          VAT may apply. Cancel anytime.
         </p>
       </div>
 
-      {/* Email Modal */}
-      {showEmailModal && (
+      {/* Auth Modal - redirect to panel login/register */}
+      {showAuthModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-md p-4">
-          <div 
+          <div
             className="bg-card rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border animate-fade-up"
           >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-foreground">
-                  Start Your Free Trial
+                  Continue to Checkout
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  14 days free, no credit card required
+                  Sign in or create your account to continue with {plans.find((p) => p.slug === selectedPlan)?.name}
                 </p>
               </div>
-              <button 
-                onClick={() => setShowEmailModal(false)}
+              <button
+                onClick={() => setShowAuthModal(false)}
                 className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
               >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
-            
+
             <div className="bg-primary/5 rounded-xl p-4 mb-6 border border-primary/10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -262,43 +242,41 @@ export function PricingSection() {
                     {plans.find((p) => p.slug === selectedPlan)?.name} Plan
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatPrice(getPrice(plans.find((p) => p.slug === selectedPlan)?.price || 0))} / {billingInterval === 'monthly' ? 'month' : 'year'}
+                    {formatPrice(getPrice(plans.find((p) => p.slug === selectedPlan) || { slug: '', name: '', price: 0 }))} / {billingInterval === 'monthly' ? 'month' : 'year'}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Work email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  className="w-full px-4 py-3.5 rounded-xl border-2 border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                />
-              </div>
+            <div className="space-y-3">
+              {PANEL_URL ? (
+                <>
+                  <Button
+                    asChild
+                    className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25"
+                  >
+                    <a href={buildAuthUrl('register')}>
+                      Create account
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full h-12 text-base font-semibold"
+                  >
+                    <a href={buildAuthUrl('login')}>
+                      Log in
+                    </a>
+                  </Button>
+                </>
+              ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Panel URL not configured. Set NEXT_PUBLIC_PANEL_URL in your environment.
+                </p>
+              )}
 
-              <Button
-                onClick={handleCheckout}
-                disabled={!email || checkoutLoading !== null}
-                className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25"
-              >
-                {checkoutLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Processing...
-                  </>
-                ) : (
-                  'Continue to Checkout'
-                )}
-              </Button>
-              
               <button
-                onClick={() => setShowEmailModal(false)}
+                onClick={() => setShowAuthModal(false)}
                 className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
                 Cancel

@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false)
-  
+
   useEffect(() => {
     setIsVisible(true)
   }, [])
@@ -23,15 +23,14 @@ export function HeroSection() {
         {/* Subtle grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#2E7D6B08_1px,transparent_1px),linear-gradient(to_bottom,#2E7D6B08_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
-      
+
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
           {/* Content */}
           <div className="max-w-2xl">
-            <div 
-              className={`transition-all duration-700 ease-out ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+            <div
+              className={`transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
             >
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-medium text-primary mb-8 hover:bg-primary/15 transition-colors cursor-default">
                 <Sparkles className="h-4 w-4" />
@@ -42,45 +41,42 @@ export function HeroSection() {
                 </span>
               </div>
             </div>
-            
-            <h1 
-              className={`text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance leading-[1.1] transition-all duration-700 ease-out delay-100 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+
+            <h1
+              className={`text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance leading-[1.1] transition-all duration-700 ease-out delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
             >
               Run Your Assembly and Packing Operations{' '}
               <span className="gradient-text">Without Chaos</span>
             </h1>
-            
-            <p 
-              className={`mt-8 text-lg lg:text-xl text-muted-foreground leading-relaxed transition-all duration-700 ease-out delay-200 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+
+            <p
+              className={`mt-8 text-lg lg:text-xl text-muted-foreground leading-relaxed transition-all duration-700 ease-out delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
             >
-              Gingy helps warehouse teams organize products, supplies, tasks, and workers 
-              in one powerful system. From task assignment to inventory tracking, manage 
+              Gingy helps warehouse teams organize products, supplies, tasks, and workers
+              in one powerful system. From task assignment to inventory tracking, manage
               everything in real-time.
             </p>
-            
-            <div 
-              className={`mt-10 flex flex-wrap gap-4 transition-all duration-700 ease-out delay-300 ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+
+            <div
+              className={`mt-10 flex flex-wrap gap-4 transition-all duration-700 ease-out delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
             >
-              <Button 
-                size="lg" 
-                asChild 
+              <Button
+                size="lg"
+                asChild
                 className="gap-2 h-14 px-8 text-base font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300"
               >
                 <Link href="#pricing">
-                  Start Free Trial
+                  Get Started
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                asChild 
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
                 className="gap-2 h-14 px-8 text-base font-semibold border-2 hover:bg-primary/5 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
               >
                 <Link href="#how-it-works">
@@ -89,12 +85,11 @@ export function HeroSection() {
                 </Link>
               </Button>
             </div>
-            
+
             {/* Trust indicators */}
-            <div 
-              className={`mt-12 pt-10 border-t border-border transition-all duration-700 ease-out delay-[400ms] ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
+            <div
+              className={`mt-12 pt-10 border-t border-border transition-all duration-700 ease-out delay-[400ms] ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
             >
               <div className="flex flex-wrap items-center gap-8">
                 <div className="flex -space-x-3">
@@ -122,12 +117,11 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-          
+
           {/* Visual */}
-          <div 
-            className={`relative transition-all duration-700 ease-out delay-200 ${
-              isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-            }`}
+          <div
+            className={`relative transition-all duration-700 ease-out delay-200 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+              }`}
           >
             <DashboardPreview />
           </div>
@@ -142,7 +136,7 @@ function DashboardPreview() {
     <div className="relative">
       {/* Glow effect behind dashboard */}
       <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-accent/20 rounded-3xl blur-2xl opacity-50" />
-      
+
       {/* Main dashboard card */}
       <div className="relative bg-card rounded-2xl shadow-2xl border border-border overflow-hidden premium-card">
         {/* Dashboard header */}
@@ -161,7 +155,7 @@ function DashboardPreview() {
             <div className="w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition-colors cursor-pointer" />
           </div>
         </div>
-        
+
         {/* Dashboard content */}
         <div className="p-6 space-y-5">
           {/* Stats row */}
@@ -179,7 +173,7 @@ function DashboardPreview() {
               <div className="text-sm text-muted-foreground mt-1">Completion</div>
             </div>
           </div>
-          
+
           {/* Task list preview */}
           <div className="space-y-3">
             {[
@@ -187,17 +181,16 @@ function DashboardPreview() {
               { task: 'Assemble Widget Set', status: 'Pending', urgent: false },
               { task: 'Inventory Check B2', status: 'Pending', urgent: false },
             ].map((item, i) => (
-              <div 
-                key={item.task} 
+              <div
+                key={item.task}
                 className="flex items-center gap-4 bg-muted/50 rounded-xl px-4 py-3.5 border border-border/50 hover:border-primary/30 hover:bg-muted transition-all cursor-pointer"
               >
                 <div className={`w-2.5 h-2.5 rounded-full ${item.urgent ? 'bg-accent animate-pulse' : 'bg-primary'}`} />
                 <span className="text-sm font-medium text-foreground flex-1">{item.task}</span>
-                <span className={`text-xs px-2.5 py-1 rounded-full ${
-                  item.urgent 
-                    ? 'bg-accent/10 text-accent font-medium' 
+                <span className={`text-xs px-2.5 py-1 rounded-full ${item.urgent
+                    ? 'bg-accent/10 text-accent font-medium'
                     : 'bg-muted text-muted-foreground'
-                }`}>
+                  }`}>
                   {item.status}
                 </span>
               </div>
@@ -205,7 +198,7 @@ function DashboardPreview() {
           </div>
         </div>
       </div>
-      
+
       {/* Mobile app floating card */}
       <div className="absolute -bottom-8 -left-8 w-52 bg-card rounded-2xl shadow-2xl border border-border overflow-hidden animate-float premium-card">
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 px-4 py-3 flex items-center gap-2 border-b border-border">
@@ -237,19 +230,19 @@ function DashboardPreview() {
           </div>
         </div>
       </div>
-      
+
       {/* Floating badges */}
       <div className="absolute -top-4 -right-4 bg-card rounded-xl shadow-lg border border-border px-4 py-2.5 flex items-center gap-2 animate-float" style={{ animationDelay: '1s' }}>
         <CheckCircle2 className="w-5 h-5 text-primary" />
         <span className="text-sm font-semibold text-foreground">Real-time sync</span>
       </div>
-      
+
       {/* Mascot with actual logo */}
       <div className="absolute top-16 -right-6 w-16 h-16 animate-float" style={{ animationDelay: '0.5s' }}>
-        <Image 
-          src="/images/gingy-logo.png" 
-          alt="Gingy Mascot" 
-          width={64} 
+        <Image
+          src="/images/gingy-logo.png"
+          alt="Gingy Mascot"
+          width={64}
           height={64}
           className="w-full h-full object-contain drop-shadow-lg"
         />

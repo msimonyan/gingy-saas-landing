@@ -1,30 +1,56 @@
+/**
+ * Gingy SaaS API client - integrates with gingy-saas-api billing endpoints.
+ * Uses Next.js API routes as proxy to avoid CORS (client -> /api/* -> backend).
+ */
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
+
+// Billing interval values matching API BillingInterval enum
+export const BILLING_INTERVAL = {
+  MONTHLY: 1,
+  YEARLY: 2,
+  WEEKLY: 3,
+} as const
+
+export interface BillingPlanPrice {
+  billing_interval: number
+  billing_interval_label: string
+  amount: number // in cents
+  currency: string
+  region_code: string
+}
+
+export interface ApiPlan {
+  id: number
+  slug: string
+  name: string
+  description: string | null
+  prices: BillingPlanPrice[]
+}
 
 export interface BillingPlan {
   slug: string
   name: string
-  price: number
+  price: number // in currency units (RUB), for display (monthly)
+  monthlyPrice?: number
+  yearlyPrice?: number // total yearly amount
   features?: string[]
   popular?: boolean
 }
 
-export interface CheckoutResponse {
-  confirmation_url: string
+export interface PlansApiResponse {
+  status: boolean
+  currency: string
+  plans: ApiPlan[]
 }
 
-export interface CheckoutPayload {
-  plan_slug: string
-  billing_interval: 'monthly' | 'yearly'
-  email: string
-  return_url: string
-}
-
-// Mock pricing data for fallback
+// Mock pricing data for fallback when API is not configured
 const mockPlans: BillingPlan[] = [
   {
     slug: 'starter',
     name: 'Starter',
     price: 990,
+    monthlyPrice: 990,
     features: [
       'Up to 5 workers',
       '1 warehouse',
@@ -38,6 +64,7 @@ const mockPlans: BillingPlan[] = [
     slug: 'growth',
     name: 'Growth',
     price: 1990,
+    monthlyPrice: 1990,
     features: [
       'Up to 25 workers',
       '3 warehouses',
@@ -53,6 +80,7 @@ const mockPlans: BillingPlan[] = [
     slug: 'enterprise',
     name: 'Enterprise',
     price: 4990,
+    monthlyPrice: 4990,
     features: [
       'Unlimited workers',
       'Unlimited warehouses',
@@ -66,50 +94,84 @@ const mockPlans: BillingPlan[] = [
   },
 ]
 
-export async function fetchBillingPlans(): Promise<BillingPlan[]> {
+/**
+ * Transform API plan format to BillingPlan for the pricing UI.
+ * Amount from API is in cents; we convert to display units.
+ */
+function transformApiPlanToBillingPlan(apiPlan: ApiPlan): BillingPlan {
+  const monthlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.MONTHLY)
+  const yearlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.YEARLY)
+
+  const monthlyPrice = monthlyPriceObj ? monthlyPriceObj.amount / 100 : 0
+  const yearlyPrice = yearlyPriceObj ? yearlyPriceObj.amount / 100 : monthlyPrice * 10 // ~2 months free
+
+  return {
+    slug: apiPlan.slug,
+    name: apiPlan.name,
+    price: monthlyPrice,
+    monthlyPrice,
+    yearlyPrice,
+    features: getDefaultFeaturesForPlan(apiPlan.slug),
+    popular: apiPlan.slug.toLowerCase().includes('growth') || apiPlan.slug.toLowerCase().includes('pro'),
+  }
+}
+
+function getDefaultFeaturesForPlan(slug: string): string[] {
+  const s = slug.toLowerCase()
+  if (s.includes('starter')) {
+    return ['Up to 5 workers', '1 warehouse', 'Basic task management', 'Email support', 'Mobile app access']
+  }
+  if (s.includes('growth') || s.includes('pro')) {
+    return ['Up to 25 workers', '3 warehouses', 'Advanced task management', 'Inventory tracking', 'Analytics dashboard', 'Priority support', 'API access']
+  }
+  if (s.includes('enterprise')) {
+    return ['Unlimited workers', 'Unlimited warehouses', 'Custom integrations', 'Advanced analytics', 'Dedicated support', 'SLA guarantee', 'Custom onboarding']
+  }
+  return []
+}
+
+
+export interface FetchPlansResult {
+  plans: BillingPlan[]
+  currency: string
+}
+
+/**
+ * Fetch billing plans from the API.
+ * GET /api/billing/plans
+ * Response: { status: true, currency: string, plans: ApiPlan[] }
+ */
+export async function fetchBillingPlans(currency = 'RUB'): Promise<FetchPlansResult> {
   if (!API_BASE_URL) {
-    return mockPlans
+    return { plans: mockPlans, currency: 'RUB' }
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/billing/plans`, {
+    // Use same-origin proxy to avoid CORS
+    const response = await fetch(`/api/plans?currency=${currency}`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     })
 
     if (!response.ok) {
-      throw new Error('Failed to fetch billing plans')
+      throw new Error(`Failed to fetch billing plans: ${response.status}`)
     }
 
-    const data = await response.json()
-    return data.data || mockPlans
+    const data: PlansApiResponse = await response.json()
+
+    if (!data.status || !Array.isArray(data.plans)) {
+      return { plans: mockPlans, currency: data.currency ?? 'RUB' }
+    }
+
+    return {
+      plans: data.plans.map(transformApiPlanToBillingPlan),
+      currency: data.currency ?? 'RUB',
+    }
   } catch (error) {
     console.error('Error fetching billing plans:', error)
-    return mockPlans
+    return { plans: mockPlans, currency: 'RUB' }
   }
 }
 
-export async function createCheckout(payload: CheckoutPayload): Promise<CheckoutResponse> {
-  if (!API_BASE_URL) {
-    // Mock checkout - redirect to a demo page
-    return {
-      confirmation_url: `${window.location.origin}/checkout/demo?plan=${payload.plan_slug}`,
-    }
-  }
-
-  const response = await fetch(`${API_BASE_URL}/api/billing/checkout`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  })
-
-  if (!response.ok) {
-    throw new Error('Failed to create checkout')
-  }
-
-  return response.json()
-}

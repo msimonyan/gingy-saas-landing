@@ -28,7 +28,7 @@ export function ProblemSection() {
             Warehouse chaos costs you time, money, and sanity. Gingy brings order to your operations.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 gap-8 lg:gap-16 items-start">
           {/* Problems */}
           <div className="bg-card rounded-2xl border border-border p-8">
@@ -49,7 +49,7 @@ export function ProblemSection() {
               ))}
             </ul>
           </div>
-          
+
           {/* Solutions */}
           <div className="bg-primary/5 rounded-2xl border border-primary/20 p-8">
             <div className="flex items-center gap-3 mb-6">
@@ -70,7 +70,7 @@ export function ProblemSection() {
             </ul>
           </div>
         </div>
-        
+
         <div className="mt-12 flex justify-center">
           <a
             href="#features"

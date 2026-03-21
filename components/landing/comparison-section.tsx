@@ -30,7 +30,7 @@ export function ComparisonSection() {
             Different tools for different roles, all working together seamlessly.
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 gap-8">
           {/* Managers */}
           <div className="bg-background rounded-2xl border border-border overflow-hidden">
@@ -52,7 +52,7 @@ export function ComparisonSection() {
                   </li>
                 ))}
               </ul>
-              
+
               {/* Mini dashboard preview */}
               <div className="mt-6 bg-muted rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -76,7 +76,7 @@ export function ComparisonSection() {
               </div>
             </div>
           </div>
-          
+
           {/* Workers */}
           <div className="bg-background rounded-2xl border border-border overflow-hidden">
             <div className="bg-accent px-6 py-4 flex items-center gap-3">
@@ -97,7 +97,7 @@ export function ComparisonSection() {
                   </li>
                 ))}
               </ul>
-              
+
               {/* Mini mobile preview */}
               <div className="mt-6 bg-muted rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">

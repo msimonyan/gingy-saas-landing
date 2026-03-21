@@ -1,4 +1,4 @@
-import { Building2, Package, Users, TrendingUp } from 'lucide-react'
+import { Building2, ChevronRight, Package, Users, TrendingUp } from 'lucide-react'
 
 const steps = [
   {
@@ -42,11 +42,11 @@ export function HowItWorksSection() {
             Gingy is designed for quick setup and immediate productivity gains.
           </p>
         </div>
-        
+
         <div className="relative">
           {/* Connection line */}
           <div className="absolute top-24 left-0 right-0 h-0.5 bg-border hidden lg:block" />
-          
+
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={step.step} className="relative">
@@ -55,23 +55,21 @@ export function HowItWorksSection() {
                   <div className="relative z-10 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg mb-6 mx-auto lg:mx-0">
                     {step.step}
                   </div>
-                  
+
                   <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-4">
                     <step.icon className="w-6 h-6 text-accent" />
                   </div>
-                  
+
                   <h3 className="font-semibold text-foreground mb-2">{step.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {step.description}
                   </p>
                 </div>
-                
+
                 {/* Arrow for desktop */}
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-24 -right-4 w-8 h-8 bg-background border border-border rounded-full flex items-center justify-center z-20">
-                    <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                  <div className="hidden lg:flex absolute top-24 -right-4 w-8 h-8 bg-background border border-border rounded-full items-center justify-center z-20">
+                    <ChevronRight className="w-4 h-4 text-primary shrink-0" strokeWidth={2} />
                   </div>
                 )}
               </div>
