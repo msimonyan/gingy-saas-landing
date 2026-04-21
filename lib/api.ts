@@ -52,11 +52,11 @@ const mockPlans: BillingPlan[] = [
     price: 990,
     monthlyPrice: 990,
     features: [
-      'Up to 5 workers',
-      '1 warehouse',
-      'Basic task management',
-      'Email support',
-      'Mobile app access',
+      'До 5 сотрудников',
+      '1 склад',
+      'Базовое управление задачами',
+      'Доступ к мобильному приложению',
+      'Поддержка по email',
     ],
     popular: false,
   },
@@ -66,13 +66,13 @@ const mockPlans: BillingPlan[] = [
     price: 1990,
     monthlyPrice: 1990,
     features: [
-      'Up to 25 workers',
-      '3 warehouses',
-      'Advanced task management',
-      'Inventory tracking',
-      'Analytics dashboard',
-      'Priority support',
-      'API access',
+      'До 25 сотрудников',
+      'До 3 складов',
+      'Расширенное управление задачами',
+      'Учет остатков и поставок',
+      'Панель аналитики',
+      'Приоритетная поддержка',
+      'Интеграционные возможности',
     ],
     popular: true,
   },
@@ -82,13 +82,13 @@ const mockPlans: BillingPlan[] = [
     price: 4990,
     monthlyPrice: 4990,
     features: [
-      'Unlimited workers',
-      'Unlimited warehouses',
-      'Custom integrations',
-      'Advanced analytics',
-      'Dedicated support',
-      'SLA guarantee',
-      'Custom onboarding',
+      'Безлимит по сотрудникам',
+      'Безлимит по складам',
+      'Индивидуальные интеграции',
+      'Расширенная аналитика',
+      'Выделенная поддержка',
+      'SLA и сопровождение',
+      'Индивидуальный онбординг',
     ],
     popular: false,
   },
@@ -119,13 +119,13 @@ function transformApiPlanToBillingPlan(apiPlan: ApiPlan): BillingPlan {
 function getDefaultFeaturesForPlan(slug: string): string[] {
   const s = slug.toLowerCase()
   if (s.includes('starter')) {
-    return ['Up to 5 workers', '1 warehouse', 'Basic task management', 'Email support', 'Mobile app access']
+    return ['До 5 сотрудников', '1 склад', 'Базовое управление задачами', 'Доступ к мобильному приложению', 'Поддержка по email']
   }
   if (s.includes('growth') || s.includes('pro')) {
-    return ['Up to 25 workers', '3 warehouses', 'Advanced task management', 'Inventory tracking', 'Analytics dashboard', 'Priority support', 'API access']
+    return ['До 25 сотрудников', 'До 3 складов', 'Расширенное управление задачами', 'Учет остатков и поставок', 'Панель аналитики', 'Приоритетная поддержка', 'Интеграционные возможности']
   }
   if (s.includes('enterprise')) {
-    return ['Unlimited workers', 'Unlimited warehouses', 'Custom integrations', 'Advanced analytics', 'Dedicated support', 'SLA guarantee', 'Custom onboarding']
+    return ['Безлимит по сотрудникам', 'Безлимит по складам', 'Индивидуальные интеграции', 'Расширенная аналитика', 'Выделенная поддержка', 'SLA и сопровождение', 'Индивидуальный онбординг']
   }
   return []
 }

@@ -34,7 +34,7 @@ export function HeroSection() {
             >
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-medium text-primary mb-8 hover:bg-primary/15 transition-colors cursor-default">
                 <Sparkles className="h-4 w-4" />
-                <span>Now with mobile worker app</span>
+                <span>Панель и мобильное приложение для сотрудников</span>
                 <span className="flex h-2 w-2 relative">
                   <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -46,17 +46,17 @@ export function HeroSection() {
               className={`text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl text-balance leading-[1.1] transition-all duration-700 ease-out delay-100 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
             >
-              Run Your Assembly and Packing Operations{' '}
-              <span className="gradient-text">Without Chaos</span>
+              Управляйте складом, поставками и задачами{' '}
+              <span className="gradient-text">без хаоса</span>
             </h1>
 
             <p
               className={`mt-8 text-lg lg:text-xl text-muted-foreground leading-relaxed transition-all duration-700 ease-out delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
             >
-              Gingy helps warehouse teams organize products, supplies, tasks, and workers
-              in one powerful system. From task assignment to inventory tracking, manage
-              everything in real-time.
+              Gingy объединяет товары, комплектующие, склады, поставки, задачи и команду
+              в одной системе. Руководители видят процессы в панели, а сотрудники
+              получают задания и инструкции в мобильном приложении.
             </p>
 
             <div
@@ -69,7 +69,7 @@ export function HeroSection() {
                 className="gap-2 h-14 px-8 text-base font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300"
               >
                 <Link href="#pricing">
-                  Get Started
+                  Выбрать тариф
                   <ArrowRight className="h-5 w-5" />
                 </Link>
               </Button>
@@ -81,7 +81,7 @@ export function HeroSection() {
               >
                 <Link href="#how-it-works">
                   <Play className="h-5 w-5" />
-                  See How It Works
+                  Как это работает
                 </Link>
               </Button>
             </div>
@@ -103,15 +103,11 @@ export function HeroSection() {
                   ))}
                 </div>
                 <div>
-                  <div className="flex items-center gap-1 text-accent">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                  </div>
+                  <p className="text-sm font-semibold text-foreground">
+                    Задачи, склад и аналитика в одной системе
+                  </p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    <span className="font-semibold text-foreground">500+</span> warehouses trust Gingy
+                    Для руководителей, кладовщиков и производственных команд
                   </p>
                 </div>
               </div>
@@ -147,7 +143,7 @@ function DashboardPreview() {
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
             </div>
-            <span className="text-white font-semibold text-lg">Gingy Dashboard</span>
+            <span className="text-white font-semibold text-lg">Панель Gingy</span>
           </div>
           <div className="flex gap-2">
             <div className="w-3 h-3 rounded-full bg-white/30 hover:bg-white/50 transition-colors cursor-pointer" />
@@ -162,24 +158,24 @@ function DashboardPreview() {
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 border border-primary/10">
               <div className="text-3xl font-bold text-primary">127</div>
-              <div className="text-sm text-muted-foreground mt-1">Active Tasks</div>
+              <div className="text-sm text-muted-foreground mt-1">Активных задач</div>
             </div>
             <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-xl p-4 border border-accent/10">
               <div className="text-3xl font-bold text-accent">24</div>
-              <div className="text-sm text-muted-foreground mt-1">Workers Online</div>
+              <div className="text-sm text-muted-foreground mt-1">Сотрудников онлайн</div>
             </div>
             <div className="bg-gradient-to-br from-muted to-muted/50 rounded-xl p-4 border border-border">
               <div className="text-3xl font-bold text-foreground">98%</div>
-              <div className="text-sm text-muted-foreground mt-1">Completion</div>
+              <div className="text-sm text-muted-foreground mt-1">Выполнение</div>
             </div>
           </div>
 
           {/* Task list preview */}
           <div className="space-y-3">
             {[
-              { task: 'Pack Order #1234', status: 'In Progress', urgent: true },
-              { task: 'Assemble Widget Set', status: 'Pending', urgent: false },
-              { task: 'Inventory Check B2', status: 'Pending', urgent: false },
+              { task: 'Собрать комплект продукции', status: 'В работе', urgent: true },
+              { task: 'Принять поставку на склад', status: 'Ожидает', urgent: false },
+              { task: 'Проверить остатки в ячейке B2', status: 'Ожидает', urgent: false },
             ].map((item, i) => (
               <div
                 key={item.task}
@@ -207,7 +203,7 @@ function DashboardPreview() {
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-foreground">Worker App</span>
+          <span className="text-sm font-semibold text-foreground">Приложение сотрудника</span>
         </div>
         <div className="p-4 space-y-4">
           <div className="flex items-center gap-3">
@@ -215,13 +211,13 @@ function DashboardPreview() {
               <span className="text-base font-bold text-accent">3</span>
             </div>
             <div>
-              <div className="text-sm font-semibold text-foreground">New Tasks</div>
-              <div className="text-xs text-muted-foreground">Tap to view</div>
+              <div className="text-sm font-semibold text-foreground">Новые задачи</div>
+              <div className="text-xs text-muted-foreground">Откройте, чтобы посмотреть</div>
             </div>
           </div>
           <div>
             <div className="flex justify-between text-xs mb-1.5">
-              <span className="text-muted-foreground">Daily progress</span>
+              <span className="text-muted-foreground">Прогресс за день</span>
               <span className="font-semibold text-primary">75%</span>
             </div>
             <div className="h-2.5 bg-muted rounded-full overflow-hidden">
@@ -234,14 +230,14 @@ function DashboardPreview() {
       {/* Floating badges */}
       <div className="absolute -top-4 -right-4 bg-card rounded-xl shadow-lg border border-border px-4 py-2.5 flex items-center gap-2 animate-float" style={{ animationDelay: '1s' }}>
         <CheckCircle2 className="w-5 h-5 text-primary" />
-        <span className="text-sm font-semibold text-foreground">Real-time sync</span>
+        <span className="text-sm font-semibold text-foreground">Синхронизация в реальном времени</span>
       </div>
 
       {/* Mascot with actual logo */}
       <div className="absolute top-16 -right-6 w-16 h-16 animate-float" style={{ animationDelay: '0.5s' }}>
         <Image
           src="/images/gingy-logo.png"
-          alt="Gingy Mascot"
+          alt="Логотип Gingy"
           width={64}
           height={64}
           className="w-full h-full object-contain drop-shadow-lg"

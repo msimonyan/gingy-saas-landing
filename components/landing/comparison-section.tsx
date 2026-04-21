@@ -1,21 +1,21 @@
 import { Monitor, Smartphone, Check } from 'lucide-react'
 
 const managerFeatures = [
-  'Operations dashboard',
-  'Analytics & reporting',
-  'Inventory visibility',
-  'Subscription management',
-  'Team management',
-  'Custom integrations',
+  'Панель задач и операционный обзор',
+  'Аналитика и ключевые метрики',
+  'Контроль остатков и складов',
+  'Управление командой и доступами',
+  'Настройки компании и подписки',
+  'Интеграции с внешними сервисами',
 ]
 
 const workerFeatures = [
-  'Mobile task lists',
-  'Assembly instructions',
-  'Barcode scanning',
-  'Rewards & achievements',
-  'Team communication',
-  'Progress tracking',
+  'Список задач на день',
+  'Инструкции по работе',
+  'Статусы выполнения',
+  'Награды и достижения',
+  'Чат и рабочая коммуникация',
+  'Прогресс и личные показатели',
 ]
 
 export function ComparisonSection() {
@@ -24,10 +24,11 @@ export function ComparisonSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl text-balance">
-            Built for Both Managers and Workers
+            Для руководителей и сотрудников
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Different tools for different roles, all working together seamlessly.
+            У каждой роли свой удобный интерфейс, но все работают в одной системе и по
+            единым данным.
           </p>
         </div>
 
@@ -36,11 +37,11 @@ export function ComparisonSection() {
           <div className="bg-background rounded-2xl border border-border overflow-hidden">
             <div className="bg-primary px-6 py-4 flex items-center gap-3">
               <Monitor className="w-6 h-6 text-primary-foreground" />
-              <h3 className="text-xl font-semibold text-primary-foreground">For Managers</h3>
+              <h3 className="text-xl font-semibold text-primary-foreground">Для руководителей</h3>
             </div>
             <div className="p-6">
               <p className="text-muted-foreground mb-6">
-                Full control over operations with powerful analytics and management tools.
+                Контроль задач, складов, поставок и результатов команды из единой панели.
               </p>
               <ul className="space-y-3">
                 {managerFeatures.map((feature) => (
@@ -56,21 +57,21 @@ export function ComparisonSection() {
               {/* Mini dashboard preview */}
               <div className="mt-6 bg-muted rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-foreground">Today&apos;s Overview</span>
-                  <span className="text-xs text-muted-foreground">Live</span>
+                  <span className="text-sm font-medium text-foreground">Сводка за сегодня</span>
+                  <span className="text-xs text-muted-foreground">Онлайн</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div className="bg-card rounded p-2 text-center">
                     <div className="text-lg font-bold text-primary">89%</div>
-                    <div className="text-[10px] text-muted-foreground">Efficiency</div>
+                    <div className="text-[10px] text-muted-foreground">Эффективность</div>
                   </div>
                   <div className="bg-card rounded p-2 text-center">
                     <div className="text-lg font-bold text-accent">152</div>
-                    <div className="text-[10px] text-muted-foreground">Tasks Done</div>
+                    <div className="text-[10px] text-muted-foreground">Выполнено</div>
                   </div>
                   <div className="bg-card rounded p-2 text-center">
                     <div className="text-lg font-bold text-foreground">12</div>
-                    <div className="text-[10px] text-muted-foreground">Active</div>
+                    <div className="text-[10px] text-muted-foreground">В работе</div>
                   </div>
                 </div>
               </div>
@@ -81,11 +82,12 @@ export function ComparisonSection() {
           <div className="bg-background rounded-2xl border border-border overflow-hidden">
             <div className="bg-accent px-6 py-4 flex items-center gap-3">
               <Smartphone className="w-6 h-6 text-accent-foreground" />
-              <h3 className="text-xl font-semibold text-accent-foreground">For Workers</h3>
+              <h3 className="text-xl font-semibold text-accent-foreground">Для сотрудников</h3>
             </div>
             <div className="p-6">
               <p className="text-muted-foreground mb-6">
-                Simple mobile experience focused on completing tasks and earning rewards.
+                Простой рабочий интерфейс для выполнения задач, получения инструкций и
+                отслеживания личного прогресса.
               </p>
               <ul className="space-y-3">
                 {workerFeatures.map((feature) => (
@@ -101,11 +103,11 @@ export function ComparisonSection() {
               {/* Mini mobile preview */}
               <div className="mt-6 bg-muted rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-foreground">My Tasks</span>
-                  <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">3 new</span>
+                  <span className="text-sm font-medium text-foreground">Мои задачи</span>
+                  <span className="text-xs bg-accent/20 text-accent px-2 py-0.5 rounded-full">3 новые</span>
                 </div>
                 <div className="space-y-2">
-                  {['Pack Order #4521', 'Assemble Kit B', 'Scan Inventory'].map((task, i) => (
+                  {['Собрать комплект A', 'Принять поставку', 'Проверить остатки'].map((task, i) => (
                     <div key={task} className="bg-card rounded p-2 flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-accent' : 'bg-muted-foreground'}`} />
                       <span className="text-xs text-foreground">{task}</span>

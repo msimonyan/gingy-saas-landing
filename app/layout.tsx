@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Gingy - Assembly & Packing Operations Management',
-  description: 'Gingy helps warehouse teams organize products, supplies, tasks, and workers in one powerful system. Manage assembly and packing operations without chaos.',
+  title: 'Gingy - управление складом, задачами и поставками',
+  description: 'Gingy помогает командам управлять товарами, поставками, задачами, складами и сотрудниками в одной системе.',
   generator: 'v0.app',
   icons: {
     icon: '/icon.svg',
@@ -22,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <body className="font-sans antialiased">
         {children}
         <Analytics />

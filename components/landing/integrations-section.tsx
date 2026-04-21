@@ -3,34 +3,35 @@ import { ArrowRight } from 'lucide-react'
 const integrations = [
   {
     name: 'Wildberries',
-    description: 'Sync product data and orders',
+    description: 'Данные по товарам и рабочим сценариям',
     logo: WildberriesLogo,
   },
   {
     name: 'Moi Sklad',
-    description: 'Inventory synchronization',
+    description: 'Синхронизация складского учета',
     logo: MoiSkladLogo,
   },
   {
     name: 'YooKassa',
-    description: 'Payment processing',
+    description: 'Оплата подписки и биллинг',
     logo: YooKassaLogo,
   },
 ]
 
 export function IntegrationsSection() {
   return (
-    <section className="py-20 lg:py-32">
+    <section id="integrations" className="py-20 lg:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
-            Integrations
+            Интеграции
           </div>
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl text-balance">
-            Connect With Your Existing Tools
+            Подключайте нужные внешние сервисы
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Gingy integrates with popular platforms for product data, inventory synchronization, and billing.
+            В текущем продукте уже есть интеграции для складского учета, товарных
+            сценариев и SaaS-биллинга.
           </p>
         </div>
 
@@ -51,10 +52,10 @@ export function IntegrationsSection() {
 
         <div className="mt-12 text-center">
           <a
-            href="#api"
+            href="#pricing"
             className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
           >
-            Build custom integrations with our API
+            Посмотреть тарифы и подключение
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

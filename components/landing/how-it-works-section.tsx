@@ -4,26 +4,26 @@ const steps = [
   {
     step: 1,
     icon: Building2,
-    title: 'Create Products & Warehouses',
-    description: 'Set up your products, assembly instructions, and warehouse locations.',
+    title: 'Настройте товары и склады',
+    description: 'Добавьте товары, инструкции, комплектующие и складские локации.',
   },
   {
     step: 2,
     icon: Package,
-    title: 'Receive Supplies & Shipments',
-    description: 'Log incoming supplies and shipments for accurate inventory tracking.',
+    title: 'Заведите поставки и остатки',
+    description: 'Фиксируйте поставки, коробки и движение товаров для точного учета.',
   },
   {
     step: 3,
     icon: Users,
-    title: 'Assign Tasks to Workers',
-    description: 'Distribute assembly and packing tasks to your team via the mobile app.',
+    title: 'Распределите задачи команде',
+    description: 'Сотрудники получают задания и инструкции в панели и мобильном приложении.',
   },
   {
     step: 4,
     icon: TrendingUp,
-    title: 'Track Progress & Productivity',
-    description: 'Monitor real-time progress and analyze performance metrics.',
+    title: 'Следите за прогрессом',
+    description: 'Контролируйте выполнение задач, загрузку команды и операционные показатели.',
   },
 ]
 
@@ -33,13 +33,14 @@ export function HowItWorksSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-sm font-medium text-accent mb-4">
-            How It Works
+            Как это работает
           </div>
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl text-balance">
-            Get Started in Four Simple Steps
+            Запуск в четыре шага
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Gingy is designed for quick setup and immediate productivity gains.
+            Логика проста: вы настраиваете процессы, команда работает в одном контуре,
+            а руководитель получает прозрачную картину по операциям.
           </p>
         </div>
 

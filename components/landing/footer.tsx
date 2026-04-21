@@ -2,18 +2,11 @@ import Link from 'next/link'
 
 const navigation = {
   product: [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Integrations', href: '#integrations' },
-    { name: 'API', href: '#api' },
-    { name: 'Privacy Policy', href: '#' },
-    { name: 'Terms', href: '#' },
-  ],
-  company: [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Careers', href: '#' },
-    { name: 'Contact', href: '#' },
+    { name: 'Возможности', href: '#features' },
+    { name: 'Как это работает', href: '#how-it-works' },
+    { name: 'Интеграции', href: '#integrations' },
+    { name: 'Тарифы', href: '#pricing' },
+    { name: 'FAQ', href: '#faq' },
   ],
 }
 
@@ -21,7 +14,7 @@ export function Footer() {
   return (
     <footer className="bg-foreground">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid gap-8 md:grid-cols-[1.5fr_1fr]">
           {/* Logo and company */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="flex items-center gap-2">
@@ -29,14 +22,15 @@ export function Footer() {
               <span className="text-xl font-bold text-white">Gingy</span>
             </Link>
             <p className="mt-4 text-sm text-gray-400">
-              Assembly and packing operations management for modern warehouses.
+              Система для управления задачами, складами, поставками, товарами и
+              командой в одном рабочем контуре.
             </p>
             <p className="mt-4 text-sm text-gray-500">Aparg LLC</p>
           </div>
 
           {/* Product links */}
           <div>
-            <h3 className="text-sm font-semibold text-white">Product</h3>
+            <h3 className="text-sm font-semibold text-white">Навигация</h3>
             <ul className="mt-4 space-y-3">
               {navigation.product.map((item) => (
                 <li key={item.name}>
@@ -50,51 +44,11 @@ export function Footer() {
               ))}
             </ul>
           </div>
-
-          {/* Company links */}
-          <div>
-            <h3 className="text-sm font-semibold text-white">Company</h3>
-            <ul className="mt-4 space-y-3">
-              {navigation.company.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.href}
-                    className="text-sm text-gray-400 hover:text-white transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Newsletter */}
-          <div>
-            <h3 className="text-sm font-semibold text-white">Stay updated</h3>
-            <p className="mt-4 text-sm text-gray-400">
-              Get the latest updates on features and releases.
-            </p>
-            <form className="mt-4">
-              <div className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
-                >
-                  Subscribe
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10">
           <p className="text-sm text-gray-500 text-center">
-            &copy; {new Date().getFullYear()} Gingy by Aparg LLC. All rights reserved.
+            &copy; {new Date().getFullYear()} Gingy by Aparg LLC
           </p>
         </div>
       </div>

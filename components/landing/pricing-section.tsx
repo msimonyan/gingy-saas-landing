@@ -69,7 +69,7 @@ export function PricingSection() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
-          <p className="text-muted-foreground">Loading pricing plans...</p>
+          <p className="text-muted-foreground">Загрузка тарифов...</p>
         </div>
       </section>
     )
@@ -86,13 +86,13 @@ export function PricingSection() {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-2 text-sm font-medium text-accent mb-6">
             <Sparkles className="h-4 w-4" />
-            Pricing
+            Тарифы
           </div>
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance">
-            Simple, Transparent Pricing
+            Прозрачные тарифы
           </h2>
           <p className="mt-6 text-lg lg:text-xl text-muted-foreground">
-            Choose the plan that fits your operations.
+            Выберите план под масштаб вашей команды и складских процессов.
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export function PricingSection() {
                   : 'text-muted-foreground hover:text-foreground'
                 }`}
             >
-              Monthly
+              Месяц
             </button>
             <button
               onClick={() => setBillingInterval('yearly')}
@@ -115,7 +115,7 @@ export function PricingSection() {
                   : 'text-muted-foreground hover:text-foreground'
                 }`}
             >
-              Yearly
+              Год
               <span className={`text-xs px-2 py-0.5 rounded-full ${billingInterval === 'yearly'
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-accent/20 text-accent'
@@ -148,7 +148,7 @@ export function PricingSection() {
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg shadow-primary/25">
                       <Zap className="w-4 h-4" />
-                      Most Popular
+                      Популярный
                     </span>
                   </div>
                 )}
@@ -156,21 +156,21 @@ export function PricingSection() {
                 <div className="text-center mb-8">
                   <h3 className="text-xl font-bold text-foreground mb-2">{plan.name}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {index === 0 && 'Perfect for small teams'}
-                    {index === 1 && 'For growing operations'}
-                    {index === 2 && 'For large enterprises'}
+                    {index === 0 && 'Для небольшой команды'}
+                    {index === 1 && 'Для растущих операций'}
+                    {index === 2 && 'Для крупных компаний'}
                   </p>
                   <div className="mt-6">
                     <span className="text-5xl font-bold text-foreground">
                       {formatPrice(getPrice(plan))}
                     </span>
                     <span className="text-lg text-muted-foreground ml-1">
-                      / {billingInterval === 'monthly' ? 'mo' : 'year'}
+                      / {billingInterval === 'monthly' ? 'мес' : 'год'}
                     </span>
                   </div>
                   {billingInterval === 'yearly' && (
                     <p className="text-sm text-primary font-medium mt-2">
-                      {formatPrice(plan.monthlyPrice ?? plan.price)} / month, billed annually
+                      {formatPrice(plan.monthlyPrice ?? plan.price)} в месяц при оплате за год
                     </p>
                   )}
                 </div>
@@ -197,7 +197,7 @@ export function PricingSection() {
                     }`}
                   variant={plan.popular ? 'default' : 'outline'}
                 >
-                  Get Started
+                  Выбрать тариф
                 </Button>
               </div>
             </div>
@@ -205,7 +205,7 @@ export function PricingSection() {
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-12">
-          VAT may apply. Cancel anytime.
+          НДС рассчитывается по правилам вашего региона. Подписку можно изменить позже.
         </p>
       </div>
 
@@ -218,10 +218,10 @@ export function PricingSection() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-foreground">
-                  Continue to Checkout
+                  Продолжить оформление
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Sign in or create your account to continue with {plans.find((p) => p.slug === selectedPlan)?.name}
+                  Войдите или создайте аккаунт, чтобы продолжить с тарифом {plans.find((p) => p.slug === selectedPlan)?.name}
                 </p>
               </div>
               <button
@@ -239,10 +239,10 @@ export function PricingSection() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">
-                    {plans.find((p) => p.slug === selectedPlan)?.name} Plan
+                    Тариф {plans.find((p) => p.slug === selectedPlan)?.name}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatPrice(getPrice(plans.find((p) => p.slug === selectedPlan) || { slug: '', name: '', price: 0 }))} / {billingInterval === 'monthly' ? 'month' : 'year'}
+                    {formatPrice(getPrice(plans.find((p) => p.slug === selectedPlan) || { slug: '', name: '', price: 0 }))} / {billingInterval === 'monthly' ? 'месяц' : 'год'}
                   </p>
                 </div>
               </div>
@@ -256,7 +256,7 @@ export function PricingSection() {
                     className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25"
                   >
                     <a href={buildAuthUrl('register')}>
-                      Create account
+                      Создать аккаунт
                     </a>
                   </Button>
                   <Button
@@ -265,13 +265,13 @@ export function PricingSection() {
                     className="w-full h-12 text-base font-semibold"
                   >
                     <a href={buildAuthUrl('login')}>
-                      Log in
+                      Войти
                     </a>
                   </Button>
                 </>
               ) : (
                 <p className="text-sm text-muted-foreground text-center py-4">
-                  Panel URL not configured. Set NEXT_PUBLIC_PANEL_URL in your environment.
+                  Не настроен адрес панели. Укажите `NEXT_PUBLIC_PANEL_URL` в окружении.
                 </p>
               )}
 
@@ -279,7 +279,7 @@ export function PricingSection() {
                 onClick={() => setShowAuthModal(false)}
                 className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Cancel
+                Отмена
               </button>
             </div>
           </div>

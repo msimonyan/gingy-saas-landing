@@ -3,23 +3,23 @@ import { Activity, Smartphone, Eye, Building2 } from 'lucide-react'
 const badges = [
   {
     icon: Activity,
-    title: 'Real-Time Operations',
-    description: 'Live updates on all tasks',
+    title: 'Операции в реальном времени',
+    description: 'Актуальный статус задач и поставок',
   },
   {
     icon: Smartphone,
-    title: 'Mobile Worker App',
-    description: 'Tasks on the go',
+    title: 'Мобильное приложение',
+    description: 'Задачи и инструкции для сотрудников',
   },
   {
     icon: Eye,
-    title: 'Inventory Visibility',
-    description: 'Track every component',
+    title: 'Прозрачный учет остатков',
+    description: 'Контроль товаров и комплектующих',
   },
   {
     icon: Building2,
-    title: 'Multi-Warehouse Support',
-    description: 'Scale across locations',
+    title: 'Поддержка нескольких складов',
+    description: 'Работа по локациям и складам',
   },
 ]
 

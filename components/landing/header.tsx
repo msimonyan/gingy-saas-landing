@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 
 const navigation = [
-  { name: 'Features', href: '#features' },
-  { name: 'How It Works', href: '#how-it-works' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'API', href: '#api' },
+  { name: 'Возможности', href: '#features' },
+  { name: 'Как это работает', href: '#how-it-works' },
+  { name: 'Интеграции', href: '#integrations' },
+  { name: 'Тарифы', href: '#pricing' },
 ]
 
 export function Header() {
@@ -51,7 +51,7 @@ export function Header() {
             className="inline-flex items-center justify-center rounded-xl p-2.5 text-foreground hover:bg-muted transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            <span className="sr-only">Toggle menu</span>
+            <span className="sr-only">Открыть меню</span>
             {mobileMenuOpen ? (
               <X className="h-6 w-6" aria-hidden="true" />
             ) : (
@@ -79,13 +79,13 @@ export function Header() {
             asChild
             className="font-medium hover:bg-primary/5 hover:text-primary transition-all duration-300"
           >
-            <Link href="#pricing">Log in</Link>
+            <Link href="#pricing">Войти</Link>
           </Button>
           <Button
             asChild
             className="font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
           >
-            <Link href="#pricing">Get Started</Link>
+            <Link href="#pricing">Выбрать тариф</Link>
           </Button>
         </div>
       </nav>
@@ -109,10 +109,10 @@ export function Header() {
             ))}
             <div className="pt-4 flex flex-col gap-3">
               <Button variant="ghost" asChild className="w-full justify-center">
-                <Link href="#pricing">Log in</Link>
+                <Link href="#pricing">Войти</Link>
               </Button>
               <Button asChild className="w-full justify-center shadow-lg shadow-primary/25">
-                <Link href="#pricing">Get Started</Link>
+                <Link href="#pricing">Выбрать тариф</Link>
               </Button>
             </div>
           </div>

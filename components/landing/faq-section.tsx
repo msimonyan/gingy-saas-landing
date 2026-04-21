@@ -5,29 +5,29 @@ import { ChevronDown } from 'lucide-react'
 
 const faqs = [
   {
-    question: 'Is Gingy suitable for small teams?',
+    question: 'Подойдет ли Gingy для небольшой команды?',
     answer:
-      'Absolutely! Gingy is designed to scale with your operations. Our Starter plan is perfect for small teams with up to 5 workers, and you can upgrade as your team grows. Many of our customers started small and now manage dozens of workers across multiple warehouses.',
+      'Да. Gingy подходит как для компактной команды, так и для более крупных процессов. На старте можно работать с базовым тарифом, а по мере роста перейти на более функциональный план.',
   },
   {
-    question: 'Does Gingy support mobile workers?',
+    question: 'Есть ли мобильное приложение для сотрудников?',
     answer:
-      'Yes, Gingy includes a dedicated mobile app for workers. Workers can receive task assignments, view assembly instructions, scan barcodes, and communicate with their team - all from their mobile device. The app works on both iOS and Android.',
+      'Да. У Gingy есть отдельный мобильный сценарий для сотрудников: задачи, инструкции, статусы выполнения, коммуникация и личный прогресс доступны прямо с телефона.',
   },
   {
-    question: 'Can Gingy manage warehouses and supplies?',
+    question: 'Можно ли вести склады, товары и поставки?',
     answer:
-      'Gingy provides comprehensive warehouse and supply management. You can track inventory across multiple warehouses, manage incoming shipments, monitor component stock levels, and organize supplies by location. Real-time visibility ensures you always know what you have and where.',
+      'Да. Система поддерживает склады, товары, комплектующие, поставки и остатки. Вы видите движение по складам, текущие запасы и связанные с ними операционные задачи.',
   },
   {
-    question: 'Can plans be changed later?',
+    question: 'Можно ли позже поменять тариф?',
     answer:
-      'Yes, you can upgrade or downgrade your plan at any time. When upgrading, you will get immediate access to new features. When downgrading, the change takes effect at the start of your next billing cycle. No long-term contracts required.',
+      'Да. Тариф можно изменить позже через сценарии подписки и биллинга. Это удобно, если команда растет или меняется структура складских процессов.',
   },
   {
-    question: 'Does Gingy offer an API?',
+    question: 'Какие интеграции доступны сейчас?',
     answer:
-      'Yes, Gingy provides a comprehensive REST API for developers. You can integrate Gingy with your existing systems, automate workflows, sync inventory data, and build custom integrations. Our API documentation includes examples, SDKs, and webhook support.',
+      'На текущий момент в продукте уже используются интеграции с МойСклад, Wildberries и YooKassa для подписок. Если нужен отдельный интеграционный сценарий, его лучше обсуждать отдельно по вашему процессу.',
   },
 ]
 
@@ -35,17 +35,17 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="py-20 lg:py-32 bg-card">
+    <section id="faq" className="py-20 lg:py-32 bg-card">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
             FAQ
           </div>
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl text-balance">
-            Frequently Asked Questions
+            Частые вопросы
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Got questions? We have answers.
+            Собрали короткие ответы на самые важные вопросы перед запуском.
           </p>
         </div>
 

@@ -21,10 +21,11 @@ export function CtaSection() {
 
           <div className="relative px-8 py-16 lg:px-16 lg:py-24 text-center">
             <h2 className="text-3xl font-bold text-primary-foreground sm:text-4xl lg:text-5xl text-balance">
-              Bring Clarity to Your Warehouse Operations
+              Соберите процессы в одной системе
             </h2>
             <p className="mt-6 text-lg text-primary-foreground/80 max-w-2xl mx-auto">
-              Join 500+ warehouses already using Gingy to streamline their assembly and packing operations.
+              Gingy помогает управлять задачами, складами, поставками, сотрудниками и
+              аналитикой без разрозненных таблиц и ручной координации.
             </p>
 
             <div className="mt-10 flex flex-wrap justify-center gap-4">
@@ -35,7 +36,7 @@ export function CtaSection() {
                 className="gap-2 bg-white text-primary hover:bg-white/90"
               >
                 <Link href="#pricing">
-                  Get Started
+                  Выбрать тариф
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>
@@ -43,14 +44,14 @@ export function CtaSection() {
                 size="lg"
                 variant="outline"
                 asChild
-                className="gap-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="gap-2 bg-transparent border-primary-foreground/40 text-white hover:bg-primary-foreground/10 hover:text-white"
               >
-                <Link href="#pricing">View Pricing</Link>
+                <Link href="#pricing">Посмотреть тарифы</Link>
               </Button>
             </div>
 
             <p className="mt-6 text-sm text-primary-foreground/60">
-              Cancel anytime.
+              Подключение через панель Gingy.
             </p>
           </div>
 

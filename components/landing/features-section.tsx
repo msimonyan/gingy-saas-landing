@@ -14,50 +14,50 @@ import {
 const features = [
   {
     icon: ClipboardList,
-    title: 'Task Management',
-    description: 'Assign and track assembly or packing tasks with real-time status updates.',
+    title: 'Управление задачами',
+    description: 'Ставьте задачи команде, отслеживайте статусы и контролируйте выполнение в реальном времени.',
     color: 'primary',
   },
   {
     icon: FileText,
-    title: 'Product Instructions',
-    description: 'Clear assembly instructions and component lists for every product.',
+    title: 'Инструкции и состав',
+    description: 'Храните инструкции, составы и рабочие данные по каждому продукту в одном месте.',
     color: 'accent',
   },
   {
     icon: Package,
-    title: 'Inventory & Components',
-    description: 'Track component stock and locations across all warehouses.',
+    title: 'Товары и комплектующие',
+    description: 'Контролируйте остатки, размещение и движение товаров и комплектующих по складам.',
     color: 'primary',
   },
   {
     icon: Warehouse,
-    title: 'Supplies & Warehouses',
-    description: 'Manage shipments, boxes, and warehouse operations efficiently.',
+    title: 'Поставки и склады',
+    description: 'Ведите поставки, коробки и складские процессы без ручного хаоса.',
     color: 'accent',
   },
   {
     icon: Smartphone,
-    title: 'Worker Mobile App',
-    description: 'Barcode scanning and task instructions right on mobile devices.',
+    title: 'Мобильное приложение',
+    description: 'Сотрудники получают задачи, инструкции и прогресс прямо в мобильном приложении.',
     color: 'accent',
   },
   {
     icon: BarChart3,
-    title: 'Analytics & Performance',
-    description: 'Track productivity, packing speed, and operational metrics.',
+    title: 'Аналитика и показатели',
+    description: 'Следите за производительностью, выполнением задач и ключевыми операционными метриками.',
     color: 'primary',
   },
   {
     icon: MessageSquare,
-    title: 'Communication',
-    description: 'Real-time chat and notifications keep everyone connected.',
+    title: 'Коммуникация',
+    description: 'Чат и служебные уведомления помогают команде не терять контекст по задачам.',
     color: 'accent',
   },
   {
     icon: Trophy,
-    title: 'Gamification',
-    description: 'Coins, rewards, achievements, and an internal shop for workers.',
+    title: 'Мотивация команды',
+    description: 'Монеты, награды, достижения и внутренний магазин помогают поддерживать вовлеченность.',
     color: 'primary',
   },
 ]
@@ -74,13 +74,14 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-20">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-medium text-primary mb-6">
-            Features
+            Возможности
           </div>
           <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance">
-            Everything You Need to Run Your Operations
+            Все ключевые процессы в одной системе
           </h2>
           <p className="mt-6 text-lg lg:text-xl text-muted-foreground">
-            From task assignment to gamification, Gingy provides all the tools your warehouse needs.
+            Gingy закрывает основные задачи складской и производственной операционки:
+            от постановки задач до учета остатков и аналитики.
           </p>
         </div>
 
