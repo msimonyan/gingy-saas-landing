@@ -1,0 +1,60 @@
+name: Deploy Next.js landing to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to Server
+        env:
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -i ~/.ssh/id_ed25519 "$DEPLOY_USER@$DEPLOY_HOST" << 'ENDSSH'
+            set -e
+
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            nvm use 20
+
+            cd /var/www/gingy-landing
+
+            git fetch origin main
+            git reset --hard origin/main
+
+            npm ci
+            npm run build
+
+            if pm2 describe gingy-landing > /dev/null 2>&1; then
+              pm2 restart gingy-landing --update-env
+            else
+              pm2 start npm --name gingy-landing --cwd /var/www/gingy-landing -- start
+            fi
+
+            pm2 save
+            sudo systemctl reload nginx
+          ENDSSH
+
+      - name: Notify success
+        if: success()
+        run: echo "✅ Landing deployed successfully!"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Landing deployment failed!"
