@@ -13,7 +13,9 @@ export async function GET(request: NextRequest) {
   try {
     const res = await fetch(`${API_BASE_URL}/api/billing/plans?currency=${currency}`, {
       headers: { Accept: 'application/json' },
-      cache: 'no-store',
+      // Plans rarely change; cache at the edge for 5 minutes to keep the
+      // landing page fast and avoid hammering the throttled billing route.
+      next: { revalidate: 300 },
     })
     const data = await res.json()
 
@@ -21,7 +23,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: res.status })
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    })
   } catch (error) {
     console.error('[api/plans] Proxy error:', error)
     return NextResponse.json(

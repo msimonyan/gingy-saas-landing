@@ -1,11 +1,20 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Check, Loader2, Sparkles, X, Zap } from 'lucide-react'
-import { fetchBillingPlans, BILLING_INTERVAL, type BillingPlan } from '@/lib/api'
+import {
+  fetchBillingPlans,
+  startPublicCheckout,
+  BILLING_INTERVAL,
+  YEARLY_DISCOUNT_RATIO,
+  type BillingPlan,
+} from '@/lib/api'
 
 const PANEL_URL = process.env.NEXT_PUBLIC_PANEL_URL || ''
+
+// Basic RFC5322-light email check. Final validation is done by the API.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function PricingSection() {
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
@@ -14,6 +23,10 @@ export function PricingSection() {
   const [loading, setLoading] = useState(true)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     async function loadPlans() {
@@ -32,25 +45,93 @@ export function PricingSection() {
 
   const handleSelectPlan = (planSlug: string) => {
     setSelectedPlan(planSlug)
+    setEmail('')
+    setEmailError(null)
+    setSubmitError(null)
     setShowAuthModal(true)
   }
 
-  const buildAuthUrl = (path: 'login' | 'register') => {
-    if (!PANEL_URL || !selectedPlan) return '#'
-    const interval = billingInterval === 'monthly' ? BILLING_INTERVAL.MONTHLY : BILLING_INTERVAL.YEARLY
+  const closeModal = () => {
+    if (submitting) return
+    setShowAuthModal(false)
+  }
+
+  const intervalValue = useMemo(
+    () => (billingInterval === 'monthly' ? BILLING_INTERVAL.MONTHLY : BILLING_INTERVAL.YEARLY),
+    [billingInterval]
+  )
+
+  const loginUrl = useMemo(() => {
+    if (!PANEL_URL || !selectedPlan) return ''
     const base = PANEL_URL.replace(/\/$/, '')
     const params = new URLSearchParams({
       plan_slug: selectedPlan,
-      billing_interval: String(interval),
+      billing_interval: String(intervalValue),
       next: '/billing/checkout/start',
     })
-    return `${base}/${path}?${params.toString()}`
+    return `${base}/login?${params.toString()}`
+  }, [selectedPlan, intervalValue])
+
+  /**
+   * Pay-first funnel:
+   *   1. create a public checkout session on the API (unauthenticated)
+   *   2. redirect to the YooKassa confirmation URL
+   *   3. YooKassa returns to the panel's `/register` page with checkout_id+email
+   *      prefilled; after the user finishes registration the API auto-claims
+   *      the pending session via email match.
+   */
+  const startCheckout = async () => {
+    if (!selectedPlan) return
+    const trimmed = email.trim()
+
+    if (!EMAIL_REGEX.test(trimmed)) {
+      setEmailError('Введите корректный email.')
+      return
+    }
+    if (!PANEL_URL) {
+      setSubmitError('Не настроен адрес панели. Укажите `NEXT_PUBLIC_PANEL_URL` в окружении.')
+      return
+    }
+
+    setEmailError(null)
+    setSubmitError(null)
+    setSubmitting(true)
+
+    const returnUrlParams = new URLSearchParams({
+      email: trimmed,
+      next: '/subscription/claim',
+    })
+    const returnUrl = `${PANEL_URL.replace(/\/$/, '')}/register?${returnUrlParams.toString()}`
+
+    const result = await startPublicCheckout({
+      plan_slug: selectedPlan,
+      billing_interval: intervalValue,
+      email: trimmed,
+      return_url: returnUrl,
+    })
+
+    if (result.status && result.confirmation_url) {
+      window.location.href = result.confirmation_url
+      return
+    }
+
+    setSubmitError(result.message || 'Не удалось запустить оплату. Попробуйте ещё раз.')
+    setSubmitting(false)
   }
 
   const getPrice = (plan: BillingPlan) => {
     const monthlyPrice = plan.monthlyPrice ?? plan.price
-    const yearlyPrice = plan.yearlyPrice ?? Math.round(monthlyPrice * 10) // ~2 months free fallback
+    const yearlyPrice =
+      plan.yearlyPrice ?? Math.round(monthlyPrice * 12 * YEARLY_DISCOUNT_RATIO)
     return billingInterval === 'monthly' ? monthlyPrice : yearlyPrice
+  }
+
+  /** Effective monthly cost when paying for a year. */
+  const getYearlyMonthlyEquivalent = (plan: BillingPlan) => {
+    const monthlyPrice = plan.monthlyPrice ?? plan.price
+    const yearlyPrice =
+      plan.yearlyPrice ?? Math.round(monthlyPrice * 12 * YEARLY_DISCOUNT_RATIO)
+    return yearlyPrice / 12
   }
 
   const formatPrice = (price: number) => {
@@ -74,6 +155,8 @@ export function PricingSection() {
       </section>
     )
   }
+
+  const selectedPlanData = plans.find((p) => p.slug === selectedPlan)
 
   return (
     <section id="pricing" className="py-24 lg:py-36 relative overflow-hidden">
@@ -170,7 +253,7 @@ export function PricingSection() {
                   </div>
                   {billingInterval === 'yearly' && (
                     <p className="text-sm text-primary font-medium mt-2">
-                      {formatPrice(plan.monthlyPrice ?? plan.price)} в месяц при оплате за год
+                      {formatPrice(getYearlyMonthlyEquivalent(plan))} в месяц при оплате за год
                     </p>
                   )}
                 </div>
@@ -209,79 +292,130 @@ export function PricingSection() {
         </p>
       </div>
 
-      {/* Auth Modal - redirect to panel login/register */}
+      {/* Checkout modal - email first, pay now */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-md p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-md p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={closeModal}
+        >
           <div
             className="bg-card rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border animate-fade-up"
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-foreground">
-                  Продолжить оформление
+                  Оформление подписки
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Войдите или создайте аккаунт, чтобы продолжить с тарифом {plans.find((p) => p.slug === selectedPlan)?.name}
+                  Введите email — оплатим прямо сейчас, аккаунт создадите после оплаты.
                 </p>
               </div>
               <button
-                onClick={() => setShowAuthModal(false)}
-                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors"
+                onClick={closeModal}
+                disabled={submitting}
+                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors disabled:opacity-50"
+                aria-label="Закрыть"
               >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
 
-            <div className="bg-primary/5 rounded-xl p-4 mb-6 border border-primary/10">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    Тариф {plans.find((p) => p.slug === selectedPlan)?.name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatPrice(getPrice(plans.find((p) => p.slug === selectedPlan) || { slug: '', name: '', price: 0 }))} / {billingInterval === 'monthly' ? 'месяц' : 'год'}
-                  </p>
+            {selectedPlanData && (
+              <div className="bg-primary/5 rounded-xl p-4 mb-6 border border-primary/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-foreground">
+                      Тариф {selectedPlanData.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {formatPrice(getPrice(selectedPlanData))} / {billingInterval === 'monthly' ? 'месяц' : 'год'}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="space-y-3">
-              {PANEL_URL ? (
-                <>
-                  <Button
-                    asChild
-                    className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25"
-                  >
-                    <a href={buildAuthUrl('register')}>
-                      Создать аккаунт
-                    </a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full h-12 text-base font-semibold"
-                  >
-                    <a href={buildAuthUrl('login')}>
-                      Войти
-                    </a>
-                  </Button>
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Не настроен адрес панели. Укажите `NEXT_PUBLIC_PANEL_URL` в окружении.
-                </p>
-              )}
-
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="w-full py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            {PANEL_URL ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  startCheckout()
+                }}
+                className="space-y-4"
               >
-                Отмена
-              </button>
-            </div>
+                <div>
+                  <label htmlFor="checkout-email" className="block text-sm font-medium text-foreground mb-2">
+                    Email
+                  </label>
+                  <input
+                    id="checkout-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    required
+                    autoFocus
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (emailError) setEmailError(null)
+                    }}
+                    disabled={submitting}
+                    placeholder="you@company.com"
+                    className={`w-full h-12 px-4 rounded-xl border bg-background text-foreground outline-none transition-colors ${
+                      emailError ? 'border-destructive' : 'border-border focus:border-primary'
+                    }`}
+                  />
+                  {emailError && (
+                    <p className="text-xs text-destructive mt-1.5">{emailError}</p>
+                  )}
+                </div>
+
+                {submitError && (
+                  <div className="text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
+                    {submitError}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full h-12 text-base font-semibold shadow-lg shadow-primary/25"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Открываем оплату...
+                    </>
+                  ) : (
+                    'Перейти к оплате'
+                  )}
+                </Button>
+
+                <p className="text-xs text-muted-foreground text-center">
+                  Нажимая «Перейти к оплате», вы соглашаетесь с условиями подписки.
+                </p>
+
+                <div className="text-center text-sm text-muted-foreground">
+                  Уже есть аккаунт?{' '}
+                  <a
+                    href={loginUrl || '#'}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    Войти и оформить
+                  </a>
+                </div>
+              </form>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Не настроен адрес панели. Укажите `NEXT_PUBLIC_PANEL_URL` в окружении.
+              </p>
+            )}
           </div>
         </div>
       )}

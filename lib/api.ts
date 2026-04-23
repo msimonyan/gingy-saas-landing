@@ -26,6 +26,16 @@ export interface ApiPlan {
   name: string
   description: string | null
   prices: BillingPlanPrice[]
+  entitlements?: ApiPlanEntitlement[]
+}
+
+export interface ApiPlanEntitlement {
+  code: string
+  name?: string | null
+  description?: string | null
+  unit?: string | null
+  is_enabled: boolean
+  limit_value: number | null
 }
 
 export interface BillingPlan {
@@ -97,13 +107,21 @@ const mockPlans: BillingPlan[] = [
 /**
  * Transform API plan format to BillingPlan for the pricing UI.
  * Amount from API is in cents; we convert to display units.
+ *
+ * Fallback policy when the yearly price is missing:
+ *   yearly = monthly * 10  (i.e. ~2 months free / ~17% off)
+ * Kept in a single place so the display label and the toggle badge agree.
  */
+const YEARLY_DISCOUNT_MONTHS_EQUIVALENT = 10
+
 function transformApiPlanToBillingPlan(apiPlan: ApiPlan): BillingPlan {
   const monthlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.MONTHLY)
   const yearlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.YEARLY)
 
   const monthlyPrice = monthlyPriceObj ? monthlyPriceObj.amount / 100 : 0
-  const yearlyPrice = yearlyPriceObj ? yearlyPriceObj.amount / 100 : monthlyPrice * 10 // ~2 months free
+  const yearlyPrice = yearlyPriceObj
+    ? yearlyPriceObj.amount / 100
+    : monthlyPrice * YEARLY_DISCOUNT_MONTHS_EQUIVALENT
 
   return {
     slug: apiPlan.slug,
@@ -111,9 +129,66 @@ function transformApiPlanToBillingPlan(apiPlan: ApiPlan): BillingPlan {
     price: monthlyPrice,
     monthlyPrice,
     yearlyPrice,
-    features: getDefaultFeaturesForPlan(apiPlan.slug),
+    features: apiPlan.entitlements?.length
+      ? getFeaturesFromEntitlements(apiPlan.entitlements)
+      : getDefaultFeaturesForPlan(apiPlan.slug),
     popular: apiPlan.slug.toLowerCase().includes('growth') || apiPlan.slug.toLowerCase().includes('pro'),
   }
+}
+
+function getFeaturesFromEntitlements(entitlements: ApiPlanEntitlement[]): string[] {
+  const roleOrder = [
+    'seats_owner',
+    'seats_admin',
+    'seats_warehouse_manager',
+    'seats_staff',
+    'seats',
+    'storage_gb',
+  ]
+
+  const roleSpecificCodes = new Set(['seats_owner', 'seats_admin', 'seats_warehouse_manager', 'seats_staff'])
+  const hasRoleSpecificLimits = entitlements.some((item) => roleSpecificCodes.has(item.code) && item.is_enabled)
+
+  return entitlements
+    .filter((item) => item.is_enabled)
+    .filter((item) => !(item.code === 'seats' && hasRoleSpecificLimits))
+    .sort((a, b) => {
+      const aIndex = roleOrder.indexOf(a.code)
+      const bIndex = roleOrder.indexOf(b.code)
+      return (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) - (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex)
+    })
+    .map(formatEntitlementLabel)
+    .filter(Boolean) as string[]
+}
+
+function formatEntitlementLabel(entitlement: ApiPlanEntitlement): string | null {
+  switch (entitlement.code) {
+    case 'seats_owner':
+      return formatSeatLimit(entitlement.limit_value, ['владельца', 'владельцев'])
+    case 'seats_admin':
+      return formatSeatLimit(entitlement.limit_value, ['администратора', 'администраторов'])
+    case 'seats_warehouse_manager':
+      return formatSeatLimit(entitlement.limit_value, ['кладовщика', 'кладовщиков'])
+    case 'seats_staff':
+      return formatSeatLimit(entitlement.limit_value, ['сотрудника', 'сотрудников'])
+    case 'seats':
+      return formatSeatLimit(entitlement.limit_value, ['пользователя', 'пользователей'])
+    case 'storage_gb':
+      return entitlement.limit_value === null ? 'Хранилище: без лимита' : `Хранилище: ${entitlement.limit_value} ГБ`
+    default:
+      if (entitlement.name && entitlement.limit_value !== null) {
+        return `${entitlement.name}: ${entitlement.limit_value}`
+      }
+      return entitlement.name || entitlement.description || null
+  }
+}
+
+function formatSeatLimit(limit: number | null, forms: [string, string]): string {
+  if (limit === null) {
+    return `Без лимита по ${forms[1]}`
+  }
+
+  return `До ${limit} ${limit === 1 ? forms[0] : forms[1]}`
 }
 
 function getDefaultFeaturesForPlan(slug: string): string[] {
@@ -134,6 +209,59 @@ function getDefaultFeaturesForPlan(slug: string): string[] {
 export interface FetchPlansResult {
   plans: BillingPlan[]
   currency: string
+}
+
+export const YEARLY_DISCOUNT_RATIO = YEARLY_DISCOUNT_MONTHS_EQUIVALENT / 12
+
+export interface StartCheckoutInput {
+  plan_slug: string
+  billing_interval: number
+  email: string
+  return_url: string
+}
+
+export interface StartCheckoutResult {
+  status: boolean
+  message?: string
+  checkout_id?: string
+  confirmation_url?: string
+  provider?: string
+}
+
+/**
+ * Create an unauthenticated public checkout session and return the YooKassa
+ * confirmation URL. The caller is expected to redirect the browser to
+ * `confirmation_url` immediately on success.
+ *
+ * After the user pays, YooKassa redirects them to `return_url` (the panel),
+ * which finalizes the subscription via the auto-claim mechanism in the API.
+ */
+export async function startPublicCheckout(input: StartCheckoutInput): Promise<StartCheckoutResult> {
+  if (!API_BASE_URL) {
+    return { status: false, message: 'API is not configured.' }
+  }
+
+  try {
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(input),
+    })
+
+    const data = (await response.json().catch(() => ({}))) as StartCheckoutResult
+
+    if (!response.ok || !data?.status) {
+      return {
+        status: false,
+        message: data?.message || `Checkout failed (${response.status})`,
+      }
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error starting public checkout:', error)
+    return { status: false, message: 'Network error. Please try again.' }
+  }
 }
 
 /**
