@@ -75,13 +75,6 @@ export function Header() {
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
           <Button
-            variant="ghost"
-            asChild
-            className="font-medium hover:bg-primary/5 hover:text-primary transition-all duration-300"
-          >
-            <Link href="#pricing">Войти</Link>
-          </Button>
-          <Button
             asChild
             className="font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
           >
@@ -108,9 +101,6 @@ export function Header() {
               </Link>
             ))}
             <div className="pt-4 flex flex-col gap-3">
-              <Button variant="ghost" asChild className="w-full justify-center">
-                <Link href="#pricing">Войти</Link>
-              </Button>
               <Button asChild className="w-full justify-center shadow-lg shadow-primary/25">
                 <Link href="#pricing">Выбрать тариф</Link>
               </Button>
