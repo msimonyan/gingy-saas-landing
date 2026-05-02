@@ -301,10 +301,19 @@ export function PricingSection() {
           onClick={closeModal}
         >
           <div
-            className="bg-card rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border animate-fade-up"
+            className="relative bg-card rounded-3xl p-8 max-w-md w-full shadow-2xl border border-border animate-fade-up"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={closeModal}
+              disabled={submitting}
+              className="absolute top-5 right-5 size-9 min-w-9 shrink-0 rounded-full bg-muted text-muted-foreground flex items-center justify-center p-0 hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Закрыть"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="mb-6 pr-12">
               <div>
                 <h3 className="text-xl font-bold text-foreground">
                   Оформление подписки
@@ -313,14 +322,6 @@ export function PricingSection() {
                   Введите email — оплатим прямо сейчас, аккаунт создадите после оплаты.
                 </p>
               </div>
-              <button
-                onClick={closeModal}
-                disabled={submitting}
-                className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center hover:bg-muted/80 transition-colors disabled:opacity-50"
-                aria-label="Закрыть"
-              >
-                <X className="w-5 h-5 text-muted-foreground" />
-              </button>
             </div>
 
             {selectedPlanData && (
