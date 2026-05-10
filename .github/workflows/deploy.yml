@@ -38,8 +38,16 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            npm ci
-            npm run build
+            # Ensure swap exists to prevent OOM during install/build
+            if [ ! -f /swapfile ]; then
+              sudo fallocate -l 1G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+            fi
+
+            NODE_OPTIONS="--max-old-space-size=1024" npm ci
+            NODE_OPTIONS="--max-old-space-size=1024" npm run build
 
             if pm2 describe gingy-landing > /dev/null 2>&1; then
               pm2 restart gingy-landing --update-env
