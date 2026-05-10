@@ -24,7 +24,9 @@ export function PricingSection() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [email, setEmail] = useState('')
+  const [emailConfirm, setEmailConfirm] = useState('')
   const [emailError, setEmailError] = useState<string | null>(null)
+  const [emailConfirmError, setEmailConfirmError] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -46,7 +48,9 @@ export function PricingSection() {
   const handleSelectPlan = (planSlug: string) => {
     setSelectedPlan(planSlug)
     setEmail('')
+    setEmailConfirm('')
     setEmailError(null)
+    setEmailConfirmError(null)
     setSubmitError(null)
     setShowAuthModal(true)
   }
@@ -83,9 +87,14 @@ export function PricingSection() {
   const startCheckout = async () => {
     if (!selectedPlan) return
     const trimmed = email.trim()
+    const trimmedConfirm = emailConfirm.trim()
 
     if (!EMAIL_REGEX.test(trimmed)) {
       setEmailError('Введите корректный email.')
+      return
+    }
+    if (trimmed.toLowerCase() !== trimmedConfirm.toLowerCase()) {
+      setEmailConfirmError('Email-адреса не совпадают.')
       return
     }
     if (!PANEL_URL) {
@@ -94,6 +103,7 @@ export function PricingSection() {
     }
 
     setEmailError(null)
+    setEmailConfirmError(null)
     setSubmitError(null)
     setSubmitting(true)
 
@@ -365,6 +375,7 @@ export function PricingSection() {
                     onChange={(e) => {
                       setEmail(e.target.value)
                       if (emailError) setEmailError(null)
+                      if (emailConfirmError) setEmailConfirmError(null)
                     }}
                     disabled={submitting}
                     placeholder="you@company.com"
@@ -374,6 +385,32 @@ export function PricingSection() {
                   />
                   {emailError && (
                     <p className="text-xs text-destructive mt-1.5">{emailError}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="checkout-email-confirm" className="block text-sm font-medium text-foreground mb-2">
+                    Подтверждение email
+                  </label>
+                  <input
+                    id="checkout-email-confirm"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="off"
+                    required
+                    value={emailConfirm}
+                    onChange={(e) => {
+                      setEmailConfirm(e.target.value)
+                      if (emailConfirmError) setEmailConfirmError(null)
+                    }}
+                    disabled={submitting}
+                    placeholder="you@company.com"
+                    className={`w-full h-12 px-4 rounded-xl border bg-background text-foreground outline-none transition-colors ${
+                      emailConfirmError ? 'border-destructive' : 'border-border focus:border-primary'
+                    }`}
+                  />
+                  {emailConfirmError && (
+                    <p className="text-xs text-destructive mt-1.5">{emailConfirmError}</p>
                   )}
                 </div>
 
