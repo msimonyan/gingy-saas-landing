@@ -16,11 +16,22 @@ const PANEL_URL = process.env.NEXT_PUBLIC_PANEL_URL || ''
 // Basic RFC5322-light email check. Final validation is done by the API.
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export function PricingSection() {
+interface PricingSectionProps {
+  /**
+   * Plans fetched on the server and embedded in the initial HTML. When present,
+   * the section renders the real cards immediately (no loading skeleton, no
+   * layout shift). Falls back to a client fetch only when this is empty.
+   */
+  initialPlans?: BillingPlan[]
+  initialCurrency?: string
+}
+
+export function PricingSection({ initialPlans, initialCurrency }: PricingSectionProps = {}) {
+  const hasInitialPlans = Boolean(initialPlans && initialPlans.length > 0)
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly')
-  const [plans, setPlans] = useState<BillingPlan[]>([])
-  const [currency, setCurrency] = useState('RUB')
-  const [loading, setLoading] = useState(true)
+  const [plans, setPlans] = useState<BillingPlan[]>(initialPlans ?? [])
+  const [currency, setCurrency] = useState(initialCurrency ?? 'RUB')
+  const [loading, setLoading] = useState(!hasInitialPlans)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [email, setEmail] = useState('')
@@ -31,6 +42,10 @@ export function PricingSection() {
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
+    // Server already provided the plans — nothing to fetch, and refetching
+    // would risk a layout shift after hydration.
+    if (hasInitialPlans) return
+
     async function loadPlans() {
       try {
         const { plans: data, currency: curr } = await fetchBillingPlans()
@@ -43,7 +58,7 @@ export function PricingSection() {
       }
     }
     loadPlans()
-  }, [])
+  }, [hasInitialPlans])
 
   const handleSelectPlan = (planSlug: string) => {
     setSelectedPlan(planSlug)
@@ -154,13 +169,37 @@ export function PricingSection() {
   }
 
   if (loading) {
+    // Mirror the loaded layout (header + toggle + 3-card grid) so the section
+    // reserves the same height. Otherwise the grid popping in shifts everything
+    // below it down ~750px, which causes a visible flicker during scroll.
     return (
       <section id="pricing" className="py-24 lg:py-36">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-4 py-2 text-sm font-medium text-accent mb-6">
+              <Sparkles className="h-4 w-4" />
+              Тарифы
+            </div>
+            <h2 className="text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance">
+              Прозрачные тарифы
+            </h2>
+            <p className="mt-6 text-lg lg:text-xl text-muted-foreground">
+              Выберите план под масштаб вашей команды и складских процессов.
+            </p>
           </div>
-          <p className="text-muted-foreground">Загрузка тарифов...</p>
+
+          <div className="flex justify-center mb-16">
+            <div className="h-[60px] w-[220px] rounded-2xl border border-border bg-card animate-pulse" />
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="min-h-[512px] rounded-3xl border border-border bg-card animate-pulse"
+              />
+            ))}
+          </div>
         </div>
       </section>
     )

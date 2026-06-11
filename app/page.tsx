@@ -10,8 +10,14 @@ import { PricingSection } from '@/components/landing/pricing-section'
 import { FaqSection } from '@/components/landing/faq-section'
 import { CtaSection } from '@/components/landing/cta-section'
 import { Footer } from '@/components/landing/footer'
+import { fetchBillingPlansServer } from '@/lib/api'
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  // Fetch plans on the server so the pricing cards are present in the initial
+  // HTML. This avoids the client-side skeleton-to-cards swap that grew the
+  // pricing section after load and dragged anchor-scroll targets downward.
+  const { plans, currency } = await fetchBillingPlansServer()
+
   return (
     <main className="min-h-screen bg-background">
       <Header />
@@ -22,7 +28,7 @@ export default function LandingPage() {
       <HowItWorksSection />
       <ComparisonSection />
       <IntegrationsSection />
-      <PricingSection />
+      <PricingSection initialPlans={plans} initialCurrency={currency} />
       <FaqSection />
       <CtaSection />
       <Footer />

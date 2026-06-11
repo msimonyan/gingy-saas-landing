@@ -5,12 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
+import { SectionLink } from '@/components/landing/section-link'
 
 const navigation = [
-  { name: 'Возможности', href: '#features' },
-  { name: 'Как это работает', href: '#how-it-works' },
-  { name: 'Интеграции', href: '#integrations' },
-  { name: 'Тарифы', href: '#pricing' },
+  { name: 'Возможности', section: 'features' },
+  { name: 'Как это работает', section: 'how-it-works' },
+  { name: 'Интеграции', section: 'integrations' },
+  { name: 'Тарифы', section: 'pricing' },
 ]
 
 export function Header() {
@@ -62,14 +63,14 @@ export function Header() {
 
         <div className="hidden lg:flex lg:gap-x-10">
           {navigation.map((item) => (
-            <Link
+            <SectionLink
               key={item.name}
-              href={item.href}
+              section={item.section}
               className="relative text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 group"
             >
               {item.name}
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full" />
-            </Link>
+            </SectionLink>
           ))}
         </div>
 
@@ -78,7 +79,7 @@ export function Header() {
             asChild
             className="font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300"
           >
-            <Link href="#pricing">Выбрать тариф</Link>
+            <SectionLink section="pricing">Выбрать тариф</SectionLink>
           </Button>
         </div>
       </nav>
@@ -91,18 +92,20 @@ export function Header() {
         <div className="bg-card/95 backdrop-blur-lg border-b border-border">
           <div className="space-y-1 px-6 py-4">
             {navigation.map((item) => (
-              <Link
+              <SectionLink
                 key={item.name}
-                href={item.href}
+                section={item.section}
                 className="block rounded-xl px-4 py-3 text-base font-medium text-muted-foreground hover:bg-primary/5 hover:text-primary transition-all"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
-              </Link>
+              </SectionLink>
             ))}
             <div className="pt-4 flex flex-col gap-3">
               <Button asChild className="w-full justify-center shadow-lg shadow-primary/25">
-                <Link href="#pricing">Выбрать тариф</Link>
+                <SectionLink section="pricing" onClick={() => setMobileMenuOpen(false)}>
+                  Выбрать тариф
+                </SectionLink>
               </Button>
             </div>
           </div>

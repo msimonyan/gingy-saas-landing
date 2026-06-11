@@ -243,9 +243,25 @@
   animation-delay: 0.5s;
 }
 
-/* Smooth scroll */
 html {
-  scroll-behavior: smooth;
+  /* Note: intentionally NOT `scroll-behavior: smooth`. In-page section
+     navigation is driven by a JS animation in SectionLink (it must lock out
+     macOS trackpad inertia, which native smooth scroll can't). A global smooth
+     scroll also breaks route navigation: it turns Next.js's scroll-to-top reset
+     into an animation from the old position, so opening a legal page from the
+     footer scrolled through to the end of the doc before settling. */
+
+  /* Reserve the scrollbar's space permanently. The section-link scroll
+     animation briefly sets `overflow: hidden` to lock out trackpad inertia,
+     which hides the scrollbar; without a reserved gutter that reclaims ~15px
+     and shifts the whole page (including the fixed header) on platforms with
+     classic, non-overlay scrollbars. */
+  scrollbar-gutter: stable;
+}
+
+/* Offset anchored sections so they don't land under the fixed header */
+section[id] {
+  scroll-margin-top: 6rem;
 }
 
 /* Premium card hover effects */

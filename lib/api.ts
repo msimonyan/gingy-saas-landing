@@ -303,3 +303,48 @@ export async function fetchBillingPlans(currency = 'RUB'): Promise<FetchPlansRes
   }
 }
 
+/**
+ * Server-side variant of {@link fetchBillingPlans}. Calls the upstream billing
+ * endpoint directly (absolute URL, no same-origin proxy) so the landing page
+ * can render the real pricing cards in the initial HTML.
+ *
+ * This removes the client-side loading skeleton entirely. The skeleton could
+ * never perfectly mirror the loaded card heights (feature lists are variable),
+ * so when the async fetch resolved the pricing section grew and pushed the
+ * sections below it down. If that shift landed mid-flight during a footer
+ * anchor's smooth scroll, the browser followed the moving target — the page
+ * would reach the right section and then drift downward. Rendering on the
+ * server keeps the layout stable, so anchor navigation is deterministic.
+ */
+export async function fetchBillingPlansServer(currency = 'RUB'): Promise<FetchPlansResult> {
+  if (!API_BASE_URL) {
+    return { plans: mockPlans, currency: 'RUB' }
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/billing/plans?currency=${currency}`, {
+      headers: { Accept: 'application/json' },
+      // Plans rarely change; mirror the /api/plans proxy's 5-minute cache.
+      next: { revalidate: 300 },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch billing plans: ${response.status}`)
+    }
+
+    const data: PlansApiResponse = await response.json()
+
+    if (!data.status || !Array.isArray(data.plans)) {
+      return { plans: mockPlans, currency: data.currency ?? 'RUB' }
+    }
+
+    return {
+      plans: data.plans.map(transformApiPlanToBillingPlan),
+      currency: data.currency ?? 'RUB',
+    }
+  } catch (error) {
+    console.error('Error fetching billing plans (server):', error)
+    return { plans: mockPlans, currency: 'RUB' }
+  }
+}
+

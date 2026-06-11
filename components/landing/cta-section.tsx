@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
+import { SectionLink } from '@/components/landing/section-link'
 
 export function CtaSection() {
   return (
@@ -35,10 +35,10 @@ export function CtaSection() {
                 asChild
                 className="gap-2 bg-white text-primary hover:bg-white/90"
               >
-                <Link href="#pricing">
+                <SectionLink section="pricing">
                   Выбрать тариф
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </SectionLink>
               </Button>
               <Button
                 size="lg"
@@ -46,7 +46,7 @@ export function CtaSection() {
                 asChild
                 className="gap-2 bg-transparent border-primary-foreground/40 text-white hover:bg-primary-foreground/10 hover:text-white"
               >
-                <Link href="#pricing">Посмотреть тарифы</Link>
+                <SectionLink section="pricing">Посмотреть тарифы</SectionLink>
               </Button>
             </div>
 

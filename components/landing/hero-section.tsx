@@ -1,10 +1,10 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Play, CheckCircle2, Sparkles } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { SectionLink } from '@/components/landing/section-link'
 
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false)
@@ -68,10 +68,10 @@ export function HeroSection() {
                 asChild
                 className="gap-2 h-14 px-8 text-base font-semibold shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 hover:-translate-y-1 transition-all duration-300"
               >
-                <Link href="#pricing">
+                <SectionLink section="pricing">
                   Выбрать тариф
                   <ArrowRight className="h-5 w-5" />
-                </Link>
+                </SectionLink>
               </Button>
               <Button
                 size="lg"
@@ -79,10 +79,10 @@ export function HeroSection() {
                 asChild
                 className="gap-2 h-14 px-8 text-base font-semibold border-2 hover:bg-primary/5 hover:border-primary/30 hover:-translate-y-1 transition-all duration-300"
               >
-                <Link href="#how-it-works">
+                <SectionLink section="how-it-works">
                   <Play className="h-5 w-5" />
                   Как это работает
-                </Link>
+                </SectionLink>
               </Button>
             </div>
 

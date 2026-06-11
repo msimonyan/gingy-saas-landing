@@ -45,9 +45,6 @@ export function HowItWorksSection() {
         </div>
 
         <div className="relative">
-          {/* Connection line */}
-          <div className="absolute top-24 left-0 right-0 h-0.5 bg-border hidden lg:block" />
-
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
               <div key={step.step} className="relative">
