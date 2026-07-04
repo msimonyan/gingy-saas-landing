@@ -3,12 +3,14 @@ name: Deploy Next.js landing to VPS
 on:
   push:
     branches:
+      - develop
       - main
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'prod' || 'dev' }}
 
     steps:
       - name: Checkout code
@@ -16,47 +18,68 @@ jobs:
 
       - name: Setup SSH
         run: |
+          echo "🔐 Setting up SSH..."
           mkdir -p ~/.ssh
           echo "${{ secrets.DEPLOY_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+          echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          echo "✅ SSH setup complete."
 
       - name: Deploy to Server
         env:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          BRANCH: ${{ github.ref_name }}
         run: |
-          ssh -i ~/.ssh/id_ed25519 "$DEPLOY_USER@$DEPLOY_HOST" << 'ENDSSH'
-            set -e
+          echo "🚀 Deploying landing branch '$BRANCH' to $DEPLOY_HOST..."
 
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-            nvm use 20
+          ssh -i ~/.ssh/id_ed25519 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=6 \
+            "$DEPLOY_USER@$DEPLOY_HOST" "BRANCH='$BRANCH' bash -s" <<'ENDSSH'
+              set -euo pipefail
 
-            cd /var/www/gingy-landing
+              echo "📦 Loading Node/NVM..."
+              export NVM_DIR="$HOME/.nvm"
+              [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+              nvm use 20
 
-            git fetch origin main
-            git reset --hard origin/main
+              echo "📁 Navigating to landing directory..."
+              cd /var/www/gingy-landing
 
-            # Ensure swap exists to prevent OOM during install/build
-            if [ ! -f /swapfile ]; then
-              sudo fallocate -l 1G /swapfile
-              sudo chmod 600 /swapfile
-              sudo mkswap /swapfile
-              sudo swapon /swapfile
-            fi
+              echo "📥 Fetching and resetting to latest code from Git..."
+              git fetch origin "$BRANCH"
+              git checkout -B "$BRANCH" "origin/$BRANCH"
+              git reset --hard "origin/$BRANCH"
 
-            NODE_OPTIONS="--max-old-space-size=1024" npm ci
-            NODE_OPTIONS="--max-old-space-size=1024" npm run build
+              echo "🧠 Ensuring swap exists to prevent OOM during install/build..."
+              if [ ! -f /swapfile ]; then
+                sudo fallocate -l 1G /swapfile
+                sudo chmod 600 /swapfile
+                sudo mkswap /swapfile
+                sudo swapon /swapfile
+              fi
 
-            if pm2 describe gingy-landing > /dev/null 2>&1; then
-              pm2 restart gingy-landing --update-env
-            else
-              pm2 start npm --name gingy-landing --cwd /var/www/gingy-landing -- start
-            fi
+              echo "📦 Installing dependencies..."
+              NODE_OPTIONS="--max-old-space-size=1024" npm ci
 
-            pm2 save
-            sudo systemctl reload nginx
+              echo "🏗️ Building landing..."
+              NODE_OPTIONS="--max-old-space-size=1024" npm run build
+
+              echo "🔄 Restarting PM2..."
+              if pm2 describe gingy-landing > /dev/null 2>&1; then
+                pm2 restart gingy-landing --update-env
+              else
+                pm2 start npm --name gingy-landing --cwd /var/www/gingy-landing -- start
+              fi
+
+              pm2 save
+
+              echo "🔁 Reloading Nginx..."
+              sudo systemctl reload nginx
+
+              echo "✅ Landing deployment finished successfully!"
           ENDSSH
 
       - name: Notify success
