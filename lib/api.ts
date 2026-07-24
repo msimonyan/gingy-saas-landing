@@ -108,20 +108,18 @@ const mockPlans: BillingPlan[] = [
  * Transform API plan format to BillingPlan for the pricing UI.
  * Amount from API is in cents; we convert to display units.
  *
- * Fallback policy when the yearly price is missing:
- *   yearly = monthly * 10  (i.e. ~2 months free / ~17% off)
- * Kept in a single place so the display label and the toggle badge agree.
+ * yearlyPrice is left `undefined` when the plan has no YEARLY price row in the DB.
+ * The pricing UI treats that as "annual not offered" and hides the annual toggle,
+ * so the landing never advertises an annual option that checkout can't fulfill.
+ * The DB is the single source of truth: add a yearly price → annual appears;
+ * remove it → annual disappears.
  */
-const YEARLY_DISCOUNT_MONTHS_EQUIVALENT = 10
-
 function transformApiPlanToBillingPlan(apiPlan: ApiPlan): BillingPlan {
   const monthlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.MONTHLY)
   const yearlyPriceObj = apiPlan.prices.find((p) => p.billing_interval === BILLING_INTERVAL.YEARLY)
 
   const monthlyPrice = monthlyPriceObj ? monthlyPriceObj.amount / 100 : 0
-  const yearlyPrice = yearlyPriceObj
-    ? yearlyPriceObj.amount / 100
-    : monthlyPrice * YEARLY_DISCOUNT_MONTHS_EQUIVALENT
+  const yearlyPrice = yearlyPriceObj ? yearlyPriceObj.amount / 100 : undefined
 
   return {
     slug: apiPlan.slug,
@@ -210,8 +208,6 @@ export interface FetchPlansResult {
   plans: BillingPlan[]
   currency: string
 }
-
-export const YEARLY_DISCOUNT_RATIO = YEARLY_DISCOUNT_MONTHS_EQUIVALENT / 12
 
 export interface StartCheckoutInput {
   plan_slug: string
