@@ -7,7 +7,6 @@ import {
   fetchBillingPlans,
   startPublicCheckout,
   BILLING_INTERVAL,
-  YEARLY_DISCOUNT_RATIO,
   type BillingPlan,
 } from '@/lib/api'
 
@@ -74,6 +73,23 @@ export function PricingSection({ initialPlans, initialCurrency }: PricingSection
     if (submitting) return
     setShowAuthModal(false)
   }
+
+  // Annual is offered only when EVERY plan has a real yearly price from the DB.
+  // With no fallback, a plan whose yearly row was removed reports yearlyPrice as
+  // undefined, so we hide the annual toggle entirely rather than advertise an
+  // annual option that checkout can't fulfill ("No active price found").
+  const annualAvailable = useMemo(
+    () => plans.length > 0 && plans.every((p) => typeof p.yearlyPrice === 'number' && p.yearlyPrice > 0),
+    [plans]
+  )
+
+  // If annual isn't available (e.g. plans loaded without yearly prices), make sure
+  // we're not stuck on a hidden 'yearly' selection.
+  useEffect(() => {
+    if (!annualAvailable && billingInterval === 'yearly') {
+      setBillingInterval('monthly')
+    }
+  }, [annualAvailable, billingInterval])
 
   const intervalValue = useMemo(
     () => (billingInterval === 'monthly' ? BILLING_INTERVAL.MONTHLY : BILLING_INTERVAL.YEARLY),
@@ -146,17 +162,15 @@ export function PricingSection({ initialPlans, initialCurrency }: PricingSection
 
   const getPrice = (plan: BillingPlan) => {
     const monthlyPrice = plan.monthlyPrice ?? plan.price
-    const yearlyPrice =
-      plan.yearlyPrice ?? Math.round(monthlyPrice * 12 * YEARLY_DISCOUNT_RATIO)
-    return billingInterval === 'monthly' ? monthlyPrice : yearlyPrice
+    // The annual view only renders when annualAvailable (every plan has a real
+    // yearlyPrice), so the `?? monthlyPrice` guard is just belt-and-suspenders.
+    return billingInterval === 'monthly' ? monthlyPrice : (plan.yearlyPrice ?? monthlyPrice)
   }
 
   /** Effective monthly cost when paying for a year. */
   const getYearlyMonthlyEquivalent = (plan: BillingPlan) => {
     const monthlyPrice = plan.monthlyPrice ?? plan.price
-    const yearlyPrice =
-      plan.yearlyPrice ?? Math.round(monthlyPrice * 12 * YEARLY_DISCOUNT_RATIO)
-    return yearlyPrice / 12
+    return (plan.yearlyPrice ?? monthlyPrice * 12) / 12
   }
 
   const formatPrice = (price: number) => {
@@ -228,35 +242,37 @@ export function PricingSection({ initialPlans, initialCurrency }: PricingSection
           </p>
         </div>
 
-        {/* Billing toggle */}
-        <div className="flex justify-center mb-16">
-          <div className="inline-flex items-center bg-card rounded-2xl p-1.5 border border-border shadow-sm">
-            <button
-              onClick={() => setBillingInterval('monthly')}
-              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${billingInterval === 'monthly'
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-                  : 'text-muted-foreground hover:text-foreground'
-                }`}
-            >
-              Месяц
-            </button>
-            <button
-              onClick={() => setBillingInterval('yearly')}
-              className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${billingInterval === 'yearly'
-                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
-                  : 'text-muted-foreground hover:text-foreground'
-                }`}
-            >
-              Год
-              <span className={`text-xs px-2 py-0.5 rounded-full ${billingInterval === 'yearly'
-                  ? 'bg-accent text-accent-foreground'
-                  : 'bg-accent/20 text-accent'
-                }`}>
-                -17%
-              </span>
-            </button>
+        {/* Billing toggle — only shown when annual pricing is actually offered. */}
+        {annualAvailable && (
+          <div className="flex justify-center mb-16">
+            <div className="inline-flex items-center bg-card rounded-2xl p-1.5 border border-border shadow-sm">
+              <button
+                onClick={() => setBillingInterval('monthly')}
+                className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${billingInterval === 'monthly'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                Месяц
+              </button>
+              <button
+                onClick={() => setBillingInterval('yearly')}
+                className={`px-8 py-3 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 ${billingInterval === 'yearly'
+                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                Год
+                <span className={`text-xs px-2 py-0.5 rounded-full ${billingInterval === 'yearly'
+                    ? 'bg-accent text-accent-foreground'
+                    : 'bg-accent/20 text-accent'
+                  }`}>
+                  -17%
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Pricing cards */}
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
